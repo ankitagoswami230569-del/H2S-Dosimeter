@@ -1,0 +1,11 @@
+# Build outputs
+build/
+.gradle/
+
+# Local dev credentials — never commit
+src/main/resources/application-local.properties
+
+# IDE
+.idea/
+*.iml
+*.class

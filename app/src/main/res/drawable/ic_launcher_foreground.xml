@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground - H2S Dosimeter wristband logo (paths only) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00C4B4"
+        android:strokeWidth="4"
+        android:pathData="M54,16 A38,38 0 1,0 54.001,16 Z" />
+
+    <!-- Badge body -->
+    <path
+        android:fillColor="#1E4A75"
+        android:pathData="M38,42 L70,42 Q74,42 74,46 L74,62 Q74,66 70,66 L38,66 Q34,66 34,62 L34,46 Q34,42 38,42 Z" />
+
+    <!-- Sensor strip -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M40,50 L68,50 L68,58 L40,58 Z" />
+
+    <!-- Sensor dot via arc path -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,51 A3,3 0 1,0 54.001,51 Z" />
+
+</vector>

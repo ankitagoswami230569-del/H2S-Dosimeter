@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    H2S Dosimeter App Logo (Vector - paths only, Android VectorDrawable compatible)
+    Represents a wristband with a sensor chip and colour strip.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Outer wristband ring -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00C4B4"
+        android:strokeWidth="5"
+        android:pathData="M60,10 A50,50 0 1,0 60.001,10 Z" />
+
+    <!-- Inner ring accent -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#1E4A75"
+        android:strokeWidth="3"
+        android:pathData="M60,22 A38,38 0 1,0 60.001,22 Z" />
+
+    <!-- Central badge body -->
+    <path
+        android:fillColor="#1E4A75"
+        android:pathData="M42,46 L78,46 Q82,46 82,50 L82,70 Q82,74 78,74 L42,74 Q38,74 38,70 L38,50 Q38,46 42,46 Z" />
+
+    <!-- Sensor strip (teal bar) -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M44,54 L76,54 L76,62 L44,62 Z" />
+
+    <!-- Sensor dot (circle via path) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,54 A4,4 0 1,0 60.001,54 Z" />
+
+    <!-- Left label bar -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M48,66 L56,66 Q57,66 57,67 L57,70 Q57,70 56,70 L48,70 Q47,70 47,69 L47,66 Z" />
+
+    <!-- Right label bar -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M64,66 L72,66 Q73,66 73,67 L73,70 Q73,70 72,70 L64,70 Q63,70 63,69 L63,66 Z" />
+
+    <!-- Top wristband tab -->
+    <path
+        android:fillColor="#0D2137"
+        android:pathData="M54,10 L66,10 L66,22 L54,22 Z" />
+
+    <!-- Bottom wristband tab -->
+    <path
+        android:fillColor="#0D2137"
+        android:pathData="M54,98 L66,98 L66,110 L54,110 Z" />
+
+</vector>

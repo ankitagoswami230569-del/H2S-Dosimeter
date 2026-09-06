@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- =====================================================
+         H2S DOSIMETER - DESIGN SYSTEM COLOURS
+         Professional Industrial Safety + Modern Healthcare
+         ===================================================== -->
+
+    <!-- Primary brand (deep teal/navy - trust, precision, safety) -->
+    <color name="colorPrimary">#0D2137</color>
+    <color name="colorPrimaryVariant">#163352</color>
+    <color name="colorPrimaryLight">#1E4A75</color>
+    <color name="colorAccent">#00C4B4</color>        <!-- teal accent -->
+    <color name="colorAccentDark">#009688</color>
+
+    <!-- Secondary / highlight -->
+    <color name="colorSecondary">#0091EA</color>
+    <color name="colorSecondaryVariant">#0064B0</color>
+
+    <!-- Surface / background -->
+    <color name="colorBackground">#F0F4F8</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#E8EEF4</color>
+    <color name="colorSurfaceDark">#D0DDE8</color>
+
+    <!-- Text -->
+    <color name="colorTextPrimary">#0D2137</color>
+    <color name="colorTextSecondary">#4A6480</color>
+    <color name="colorTextHint">#8AA0B4</color>
+    <color name="colorTextOnPrimary">#FFFFFF</color>
+    <color name="colorTextOnAccent">#FFFFFF</color>
+
+    <!-- Status - SAFE / LOW -->
+    <color name="colorStatusSafe">#00897B</color>
+    <color name="colorStatusSafeLight">#B2DFDB</color>
+    <color name="colorStatusSafeBg">#E0F2F1</color>
+
+    <!-- Status - ATTENTION / ELEVATED -->
+    <color name="colorStatusWarning">#F9A825</color>
+    <color name="colorStatusWarningLight">#FFE082</color>
+    <color name="colorStatusWarningBg">#FFF8E1</color>
+
+    <!-- Status - HIGH / DANGER -->
+    <color name="colorStatusDanger">#D32F2F</color>
+    <color name="colorStatusDangerLight">#EF9A9A</color>
+    <color name="colorStatusDangerBg">#FFEBEE</color>
+
+    <!-- Badge valid / expired -->
+    <color name="colorBadgeValid">#2E7D32</color>
+    <color name="colorBadgeExpired">#C62828</color>
+    <color name="colorBadgeValidBg">#E8F5E9</color>
+    <color name="colorBadgeExpiredBg">#FFEBEE</color>
+
+    <!-- Demo/mock label colour -->
+    <color name="colorDemoLabel">#7B1FA2</color>
+    <color name="colorDemoLabelBg">#F3E5F5</color>
+
+    <!-- Divider / border -->
+    <color name="colorDivider">#DDE4EC</color>
+    <color name="colorBorder">#C8D4DF</color>
+
+    <!-- Card shadow overlay -->
+    <color name="colorCardShadow">#19000000</color>
+
+    <!-- Gauge ring colours -->
+    <color name="colorGaugeTrack">#E0E7EE</color>
+    <color name="colorGaugeLow">#00897B</color>
+    <color name="colorGaugeMedium">#F9A825</color>
+    <color name="colorGaugeHigh">#D32F2F</color>
+
+    <!-- Splash gradient -->
+    <color name="colorSplashStart">#0D2137</color>
+    <color name="colorSplashEnd">#163352</color>
+
+    <!-- Night / dark surface overrides are in values-night/colors.xml -->
+    <color name="colorOnBackground">#0D2137</color>
+    <color name="colorOnSurface">#0D2137</color>
+
+    <!-- Transparent -->
+    <color name="colorTransparent">#00000000</color>
+
+    <!-- White / black utilities -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+</resources>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_calibration.xml - Calibration management screen.
+    Allows adding, viewing, and deleting colour-response to ppm.hr reference points.
+    REAL DATA ONLY - values here directly affect ppm.hr conversion results.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".calibration.CalibrationActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:elevation="4dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:title="Sensor Calibration"
+            app:titleTextColor="@color/white"
+            style="@style/H2SToolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/screen_margin">
+
+            <!-- Warning banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardBackgroundColor="#FFF8E1"
+                app:cardCornerRadius="@dimen/card_corner_radius_small"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorStatusWarning"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_12">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠ CALIBRATION DATA — REAL MEASUREMENTS ONLY"
+                        android:textColor="@color/colorStatusWarning"
+                        android:textSize="@dimen/text_body_small"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_6" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Each calibration point must be derived from a badge exposed to a KNOWN H2S concentration for a KNOWN duration, verified by a calibrated industrial detector or laboratory analysis.\n\nDo not enter estimated or guessed values. Incorrect calibration points will produce incorrect ppm.hr estimates."
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="@dimen/text_caption"
+                        android:lineSpacingMultiplier="1.4" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CALIBRATION STATUS"
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="@dimen/text_caption"
+                        android:letterSpacing="0.08"
+                        android:textAllCaps="true"
+                        android:layout_marginBottom="@dimen/spacing_8" />
+
+                    <TextView
+                        android:id="@+id/tvCalibStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_body_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_8"
+                        tools:text="⚠ CALIBRATION REQUIRED — add 2 more points"
+                        tools:textColor="@color/colorStatusWarning" />
+
+                    <TextView
+                        android:id="@+id/tvCalibRangeSummary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_caption"
+                        android:textColor="@color/colorTextSecondary"
+                        tools:text="No calibration points" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- How-to guide card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="How to Calibrate"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_8" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1. Expose a dosimeter badge to a known H2S concentration (e.g. 5 ppm) for a known time (e.g. 2 hr) → 10 ppm.hr.\n\n2. Scan that badge with this app and note the Colour Difference value shown on the result screen.\n\n3. Return to this screen and tap Add Calibration Point. Enter the colour difference from step 2 and the known ppm.hr from step 1.\n\n4. Repeat at a minimum with one more exposure level (ideally spanning your expected measurement range).\n\n5. Once 2+ points exist, real scans will show estimated ppm.hr."
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="@dimen/text_body_small"
+                        android:lineSpacingMultiplier="1.5" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddCalibPoint"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_8"
+                android:text="Add Calibration Point"
+                android:textAllCaps="false"
+                android:textSize="@dimen/button_text_size"
+                style="@style/H2SButtonPrimary" />
+
+            <!-- Backend server sync buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/spacing_12">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSyncToServer"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height_small"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/spacing_6"
+                    android:text="↑ Sync to Server"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_body_small"
+                    app:strokeColor="@color/colorAccent"
+                    android:textColor="@color/colorAccent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLoadFromServer"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height_small"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_6"
+                    android:text="↓ Load from Server"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/text_body_small"
+                    app:strokeColor="@color/colorAccent"
+                    android:textColor="@color/colorAccent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            </LinearLayout>
+
+            <!-- Server calibration status -->
+            <TextView
+                android:id="@+id/tvServerCalibStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_body_small"
+                android:textColor="@color/colorTextHint"
+                android:layout_marginBottom="@dimen/spacing_12"
+                android:gravity="center"
+                tools:text="Server: checking..." />
+
+            <!-- Points list header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="STORED CALIBRATION POINTS"
+                android:textColor="@color/colorTextSecondary"
+                android:textSize="@dimen/text_caption"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true"
+                android:layout_marginBottom="@dimen/spacing_8"
+                android:layout_marginTop="@dimen/spacing_4" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvCalibrationPoints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_calibration_point" />
+
+            <!-- Clear all button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearCalib"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/spacing_12"
+                android:layout_marginBottom="@dimen/spacing_12"
+                android:text="Clear All Calibration Points"
+                android:textAllCaps="false"
+                android:textSize="@dimen/button_text_size"
+                app:strokeColor="@color/colorStatusDanger"
+                android:textColor="@color/colorStatusDanger"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+            <!-- Footer disclaimer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_8"
+                android:layout_marginBottom="@dimen/spacing_16"
+                android:text="IMPORTANT: Calibration data is stored locally on this device. Estimates derived from this calibration are indicative only and must not be used as the sole basis for occupational-health decisions. Validated calibration requires accredited laboratory procedures."
+                android:textColor="@color/colorTextHint"
+                android:textSize="@dimen/text_caption"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

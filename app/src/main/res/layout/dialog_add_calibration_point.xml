@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    dialog_add_calibration_point.xml
+    Dialog for entering a new calibration reference point.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/card_padding">
+
+    <!-- Colour difference input -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Colour Difference (0–441)"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 42.3"
+        android:layout_marginBottom="@dimen/spacing_12"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etColourDiff"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- ppm.hr input -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Known H2S Exposure (ppm.hr)"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="= concentration (ppm) × duration (hr)"
+        android:textColor="@color/colorTextHint"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 10.0"
+        android:layout_marginBottom="@dimen/spacing_12"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPpmHr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Label / description (optional) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Label (optional)"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. Lab test 5ppm 2hr"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionDone" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Safety warning -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_12"
+        android:text="⚠ Only enter ppm.hr values verified by a calibrated detector or laboratory test."
+        android:textColor="@color/colorStatusWarning"
+        android:textSize="@dimen/text_caption"
+        android:lineSpacingMultiplier="1.3" />
+
+</LinearLayout>

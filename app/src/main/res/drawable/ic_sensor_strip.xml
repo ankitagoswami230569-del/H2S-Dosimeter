@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sensor strip / wristband visualization for splash screen.
+    Uses only <path> elements (Android VectorDrawable requirement).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="80dp"
+    android:viewportWidth="200"
+    android:viewportHeight="80">
+
+    <!-- Wristband body -->
+    <path
+        android:fillColor="#1E4A75"
+        android:pathData="M20,20 L180,20 Q185,20 185,25 L185,55 Q185,60 180,60 L20,60 Q15,60 15,55 L15,25 Q15,20 20,20 Z" />
+
+    <!-- Sensor strip region (dark) -->
+    <path
+        android:fillColor="#0D2137"
+        android:pathData="M35,28 L130,28 Q133,28 133,31 L133,49 Q133,52 130,52 L35,52 Q32,52 32,49 L32,31 Q32,28 35,28 Z" />
+
+    <!-- Colour scale squares - reference scale (4 blocks) -->
+    <path android:fillColor="#E0F2F1" android:pathData="M140,30 L148,30 L148,50 L140,50 Z" />
+    <path android:fillColor="#80CBC4" android:pathData="M151,30 L159,30 L159,50 L151,50 Z" />
+    <path android:fillColor="#00897B" android:pathData="M162,30 L170,30 L170,50 L162,50 Z" />
+    <path android:fillColor="#004D40" android:pathData="M173,30 L181,30 L181,50 L173,50 Z" />
+
+    <!-- Sensor strip colorimetric response (teal) -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M40,34 L80,34 L80,46 L40,46 Z" />
+
+    <!-- Sensor centre dot -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M57,37 A3,3 0 1,1 56.9,37 Z" />
+
+    <!-- Expiry indicator area -->
+    <path
+        android:fillColor="#00C4B4"
+        android:pathData="M90,34 L120,34 Q122,34 122,36 L122,44 Q122,46 120,46 L90,46 Q88,46 88,44 L88,36 Q88,34 90,34 Z" />
+
+    <!-- Tick mark on expiry indicator -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:pathData="M96,40 L101,45 L114,35" />
+
+</vector>

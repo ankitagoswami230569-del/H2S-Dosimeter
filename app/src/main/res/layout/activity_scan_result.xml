@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_scan_result.xml - Shows the result of colorimetric analysis.
+    All values are DEMO/ESTIMATED - not validated H2S measurements.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".ui.scan.ScanResultActivity">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:elevation="4dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:title="Scan Result"
+            app:titleTextColor="@color/white"
+            style="@style/H2SToolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/screen_margin">
+
+            <!-- DEMO notice -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/demoNoticeBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardBackgroundColor="@color/colorDemoLabelBg"
+                app:cardCornerRadius="@dimen/card_corner_radius_small"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorDemoLabel"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_12"
+                    android:text="@string/mock_notice"
+                    android:textColor="@color/colorDemoLabel"
+                    android:textSize="@dimen/text_caption" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Exposure result card (primary) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation_raised"
+                app:cardBackgroundColor="@color/colorPrimary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center_horizontal">
+
+                    <!-- Title row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="@dimen/spacing_20">
+
+                        <TextView
+                            android:id="@+id/tvResultCardTitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Estimated Exposure"
+                            android:textColor="#99FFFFFF"
+                            android:textSize="@dimen/text_caption"
+                            android:letterSpacing="0.08"
+                            android:textAllCaps="true" />
+
+                        <TextView
+                            android:id="@+id/tvResultDemoBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_demo"
+                            style="@style/H2SDemoBadge" />
+                    </LinearLayout>
+
+                    <!-- Exposure value -->
+                    <TextView
+                        android:id="@+id/tvExposureValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="36sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_4"
+                        tools:text="0.8" />
+
+                    <TextView
+                        android:id="@+id/tvExposureUnits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ppm.hr [ESTIMATED - DEMO]"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="@dimen/text_body_small"
+                        android:layout_marginBottom="@dimen/spacing_20" />
+
+                    <!-- Exposure category chip -->
+                    <TextView
+                        android:id="@+id/tvExposureCategory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/spacing_16"
+                        android:paddingEnd="@dimen/spacing_16"
+                        android:paddingTop="@dimen/spacing_8"
+                        android:paddingBottom="@dimen/spacing_8"
+                        android:textSize="@dimen/text_body"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.06"
+                        tools:text="LOW"
+                        tools:textColor="@color/colorStatusSafe"
+                        tools:background="@drawable/bg_status_low" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Category description card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/ivCategoryIcon"
+                        android:layout_width="@dimen/icon_size_large"
+                        android:layout_height="@dimen/icon_size_large"
+                        android:src="@drawable/ic_verified"
+                        android:tint="@color/colorStatusSafe"
+                        android:contentDescription="@null"
+                        android:layout_marginEnd="@dimen/spacing_16" />
+
+                    <TextView
+                        android:id="@+id/tvCategoryDescription"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="@dimen/text_body"
+                        android:lineSpacingMultiplier="1.4"
+                        tools:text="@string/exposure_low_desc" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Calibration result card (shown for real SUCCESS captures only) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/calibrationResultSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                android:visibility="gone"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation_raised"
+                app:cardBackgroundColor="@color/colorPrimary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="H2S EXPOSURE ESTIMATE"
+                        android:textColor="#99FFFFFF"
+                        android:textSize="@dimen/text_caption"
+                        android:letterSpacing="0.08"
+                        android:textAllCaps="true"
+                        android:layout_marginBottom="@dimen/spacing_8" />
+
+                    <TextView
+                        android:id="@+id/tvCalibPpmValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_6"
+                        tools:text="12.340 ppm.hr [ESTIMATE]" />
+
+                    <TextView
+                        android:id="@+id/tvCalibResultStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_body_small"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_4"
+                        tools:text="✓ Calibrated estimate (interpolated)"
+                        tools:textColor="@color/colorStatusSafe" />
+
+                    <TextView
+                        android:id="@+id/tvCalibConfidence"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/text_caption"
+                        android:textColor="#99FFFFFF"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="@dimen/spacing_12"
+                        tools:text="Confidence: WITHIN calibration range" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠ This is a CALCULATED ESTIMATE based on stored calibration data. Accuracy depends on the quality and range of calibration points. Do not use for safety-critical decisions."
+                        android:textColor="#AAFFFFFF"
+                        android:textSize="@dimen/text_caption"
+                        android:lineSpacingMultiplier="1.4"
+                        android:layout_marginBottom="@dimen/spacing_12" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOpenCalibration"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height_small"
+                        android:text="Manage Calibration Points"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorAccent"
+                        app:strokeColor="@color/colorAccent"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Scan metadata card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan Details"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_12" />
+
+                    <!-- Date -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Date"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvScanDate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            tools:text="25-Aug-2026" />
+                    </LinearLayout>
+
+                    <!-- Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Time"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvScanTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            tools:text="08:35" />
+                    </LinearLayout>
+
+                    <!-- Shift -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Shift"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvScanShift"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            tools:text="Morning Shift" />
+                    </LinearLayout>
+
+                    <!-- Badge ID -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Badge ID"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvScanBadgeId"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            tools:text="H2S-BDG-001" />
+                    </LinearLayout>
+
+                    <!-- Image quality -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Image Quality"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvImageQuality"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorStatusSafe"
+                            android:textSize="@dimen/text_body"
+                            android:textStyle="bold"
+                            tools:text="Good" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewDetail"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_12"
+                android:text="View Full Detail"
+                android:textAllCaps="false"
+                android:textSize="@dimen/button_text_size"
+                style="@style/H2SButtonPrimary" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBackToDashboard"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginBottom="@dimen/spacing_12"
+                android:text="Back to Dashboard"
+                android:textAllCaps="false"
+                android:textSize="@dimen/button_text_size"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                app:strokeColor="@color/colorPrimary"
+                android:textColor="@color/colorPrimary" />
+
+            <!-- Safety disclaimer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_8"
+                android:text="@string/disclaimer_exposure"
+                android:textColor="@color/colorTextHint"
+                android:textSize="@dimen/text_caption"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_scan.xml - Scan Wristband entry screen.
+    Worker prepares / positions wristband badge before capturing.
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".ui.scan.ScanActivity">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:elevation="4dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:navigationIcon="@drawable/ic_scan"
+            app:navigationContentDescription="@string/btn_back"
+            app:title="Scan Wristband"
+            app:titleTextColor="@color/white"
+            style="@style/H2SToolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/screen_margin">
+
+            <!-- DEMO notice banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_16"
+                app:cardBackgroundColor="@color/colorDemoLabelBg"
+                app:cardCornerRadius="@dimen/card_corner_radius_small"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/colorDemoLabel"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_12"
+                    android:text="@string/mock_notice"
+                    android:textColor="@color/colorDemoLabel"
+                    android:textSize="@dimen/text_caption" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Badge preview illustration card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_20"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding"
+                    android:gravity="center_horizontal">
+
+                    <!-- Sensor strip icon -->
+                    <ImageView
+                        android:layout_width="@dimen/gauge_size"
+                        android:layout_height="@dimen/gauge_size"
+                        android:src="@drawable/ic_sensor_strip"
+                        android:contentDescription="@string/cd_sensor_strip"
+                        android:layout_marginBottom="@dimen/spacing_16"
+                        android:tint="@color/colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Position Your Wristband"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="@dimen/text_title_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_8" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Place the H2S sensor wristband flat on a well-lit, neutral surface. Ensure the colour reference scale is fully visible."
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="@dimen/text_body"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.4" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Badge info card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_20"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <!-- Header row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="@dimen/spacing_16">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_size"
+                            android:layout_height="@dimen/icon_size"
+                            android:src="@drawable/ic_badge"
+                            android:tint="@color/colorAccent"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/spacing_10"
+                            android:text="Badge Details"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_title"
+                            android:textStyle="bold" />
+
+                        <!-- DEMO chip -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_demo"
+                            style="@style/H2SDemoBadge" />
+                    </LinearLayout>
+
+                    <!-- Badge ID row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Badge ID"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvBadgeId"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            android:textStyle="bold"
+                            tools:text="H2S-BDG-001" />
+                    </LinearLayout>
+
+                    <!-- Badge status row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Status"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvBadgeStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="@dimen/spacing_8"
+                            android:paddingEnd="@dimen/spacing_8"
+                            android:paddingTop="@dimen/spacing_4"
+                            android:paddingBottom="@dimen/spacing_4"
+                            android:textSize="@dimen/text_caption"
+                            android:textStyle="bold"
+                            tools:text="VALID (check)"
+                            tools:background="@drawable/bg_badge_valid" />
+                    </LinearLayout>
+
+                    <!-- Expiry row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Expiry Date"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+
+                        <TextView
+                            android:id="@+id/tvBadgeExpiry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorTextPrimary"
+                            android:textSize="@dimen/text_body"
+                            tools:text="31-Aug-2026" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Checklist card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_24"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Before You Scan"
+                        android:textColor="@color/colorTextPrimary"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/spacing_12" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_size_small"
+                            android:layout_height="@dimen/icon_size_small"
+                            android:src="@drawable/ic_verified"
+                            android:tint="@color/colorStatusSafe"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_10"
+                            android:text="Badge is flat and fully unrolled"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/spacing_8"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_size_small"
+                            android:layout_height="@dimen/icon_size_small"
+                            android:src="@drawable/ic_verified"
+                            android:tint="@color/colorStatusSafe"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_10"
+                            android:text="Colour reference scale is visible"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_size_small"
+                            android:layout_height="@dimen/icon_size_small"
+                            android:src="@drawable/ic_verified"
+                            android:tint="@color/colorStatusSafe"
+                            android:contentDescription="@null" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_10"
+                            android:text="Good ambient lighting (avoid shadows)"
+                            android:textColor="@color/colorTextSecondary"
+                            android:textSize="@dimen/text_body" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Start Capture button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStartCapture"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:text="Start Camera Capture"
+                android:textAllCaps="false"
+                android:textSize="@dimen/button_text_size"
+                android:textColor="@color/white"
+                style="@style/H2SButtonAccent"
+                app:icon="@drawable/ic_scan"
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/spacing_8" />
+
+            <!-- Disclaimer -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_16"
+                android:text="@string/disclaimer_exposure"
+                android:textColor="@color/colorTextHint"
+                android:textSize="@dimen/text_caption"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.4" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

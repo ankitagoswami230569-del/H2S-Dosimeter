@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_exposure_record.xml
+    A single row in the Recent Exposure Summary list.
+    Shows: date, shift, badge ID, exposure value + category chip.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="@dimen/spacing_10"
+    android:paddingBottom="@dimen/spacing_10">
+
+    <!-- Left accent bar (colour by category) -->
+    <View
+        android:id="@+id/categoryBar"
+        android:layout_width="4dp"
+        android:layout_height="48dp"
+        android:background="@color/colorStatusSafe"
+        android:layout_marginEnd="@dimen/spacing_12" />
+
+    <!-- Date + shift column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvRecordDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="@dimen/text_body_small"
+            android:textStyle="bold"
+            tools:text="25 Aug 2026" />
+
+        <TextView
+            android:id="@+id/tvRecordShift"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextHint"
+            android:textSize="@dimen/text_caption"
+            android:layout_marginTop="@dimen/spacing_2"
+            tools:text="Morning Shift" />
+
+    </LinearLayout>
+
+    <!-- Exposure value column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/tvRecordExposure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="@dimen/text_body_small"
+            android:textStyle="bold"
+            android:gravity="center"
+            tools:text="0.8 ppm.hr" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[DEMO]"
+            android:textColor="@color/colorDemoLabel"
+            android:textSize="@dimen/text_label"
+            android:layout_marginTop="@dimen/spacing_2" />
+
+    </LinearLayout>
+
+    <!-- Category chip -->
+    <TextView
+        android:id="@+id/tvRecordCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_status_low"
+        android:paddingStart="@dimen/spacing_8"
+        android:paddingEnd="@dimen/spacing_8"
+        android:paddingTop="@dimen/spacing_4"
+        android:paddingBottom="@dimen/spacing_4"
+        android:textColor="@color/colorStatusSafe"
+        android:textSize="@dimen/text_caption"
+        android:textStyle="bold"
+        tools:text="LOW" />
+
+</LinearLayout>

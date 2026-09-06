@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App -->
+    <string name="app_name">H2S Dosimeter</string>
+    <string name="app_title">H2S DOSIMETER</string>
+    <string name="app_subtitle">Personal H2S Exposure Monitoring</string>
+    <string name="app_tagline">Industrial Safety . Colorimetric Analysis</string>
+
+    <!-- Demo / Mock labels -->
+    <string name="label_demo">DEMO</string>
+    <string name="label_mock">MOCK</string>
+    <string name="label_demo_value">DEMO VALUE</string>
+    <string name="demo_disclaimer">Estimated value - requires validated calibration before operational use.</string>
+    <string name="mock_notice">This screen uses mock/demo data only. Backend not connected.</string>
+
+    <!-- Login -->
+    <string name="login_title">Sign In</string>
+    <string name="login_subtitle">Enter your credentials to continue</string>
+    <string name="hint_worker_id">Worker ID or Email</string>
+    <string name="hint_password">Password</string>
+    <string name="btn_login">Login</string>
+    <string name="btn_demo_login">Demo Login (Frontend Test)</string>
+    <string name="lbl_remember_me">Remember me</string>
+    <string name="lbl_forgot_password">Forgot Password?</string>
+    <string name="lbl_select_role">Select Role</string>
+    <string name="role_worker">Worker</string>
+    <string name="role_safety_officer">Safety Officer</string>
+    <string name="role_admin">Admin</string>
+    <string name="error_empty_id">Please enter your Worker ID or Email</string>
+    <string name="error_empty_password">Please enter your password</string>
+    <string name="error_invalid_credentials">Invalid credentials. Use demo login for testing.</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting_morning">Good Morning</string>
+    <string name="dashboard_greeting_afternoon">Good Afternoon</string>
+    <string name="dashboard_greeting_evening">Good Evening</string>
+    <string name="dashboard_title">Dashboard</string>
+    <string name="lbl_today_exposure">Today\'s Exposure Status</string>
+    <string name="lbl_current_shift">Current Shift</string>
+    <string name="lbl_badge_status">Badge Status</string>
+    <string name="lbl_estimated_exposure">Estimated Cumulative Exposure</string>
+    <string name="lbl_exposure_category">Exposure Category</string>
+    <string name="exposure_category_low">LOW</string>
+    <string name="exposure_category_elevated">ELEVATED</string>
+    <string name="exposure_category_high">HIGH</string>
+    <string name="exposure_low_desc">Estimated exposure within monitored range.</string>
+    <string name="exposure_elevated_desc">Estimated exposure approaching attention threshold.</string>
+    <string name="exposure_high_desc">Estimated exposure elevated. Notify safety officer.</string>
+    <string name="btn_scan_wristband">SCAN WRISTBAND</string>
+    <string name="btn_view_history">VIEW HISTORY</string>
+    <string name="btn_shift_details">SHIFT DETAILS</string>
+    <string name="lbl_today_shift">Today\'s Shift</string>
+    <string name="lbl_recent_summary">Recent Exposure Summary</string>
+    <string name="lbl_badge_valid">VALID</string>
+    <string name="lbl_badge_expired">EXPIRED</string>
+    <string name="lbl_badge_id">Badge ID</string>
+    <string name="lbl_validity">Validity</string>
+    <string name="lbl_start_time">Start Time</string>
+    <string name="lbl_end_time">End Time</string>
+    <string name="lbl_shift">Shift</string>
+    <string name="lbl_worker_id">Worker ID</string>
+    <string name="lbl_worker_name">Worker Name</string>
+    <string name="lbl_department">Department</string>
+
+    <!-- Mock worker data -->
+    <string name="mock_worker_name">Ankita Demo</string>
+    <string name="mock_worker_id">WRK-001</string>
+    <string name="mock_badge_id">H2S-BDG-001</string>
+    <string name="mock_shift">Morning Shift</string>
+    <string name="mock_shift_start">06:00</string>
+    <string name="mock_shift_end">14:00</string>
+    <string name="mock_department">Process Unit A</string>
+    <string name="mock_site">Refinery Block 3</string>
+    <string name="mock_exposure_value">0.8 (DEMO)</string>
+    <string name="mock_exposure_unit">ppm.hr [ESTIMATED]</string>
+
+    <!-- Safety info -->
+    <string name="safety_info_title">Safety Information</string>
+    <string name="disclaimer_exposure">This is an estimated exposure value generated from the colorimetric badge response. It is not a direct measurement of H2S absorbed by the human body. Always follow your site safety protocols.</string>
+    <string name="disclaimer_app">This application provides estimated indications only. It does not replace certified industrial hygiene measurements or medical advice.</string>
+
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_scan">Scan</string>
+    <string name="nav_history">History</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Phase 2 - Scan screen titles -->
+    <string name="scan_title">Scan Wristband</string>
+
+    <!-- Common UI -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_export">Export Report</string>
+    <string name="lbl_loading">Loading&#8230;</string>
+    <string name="lbl_date">Date</string>
+    <string name="lbl_time">Time</string>
+    <string name="lbl_status">Status</string>
+    <string name="lbl_details">Details</string>
+    <string name="lbl_scan">Scan</string>
+
+    <!-- Version -->
+    <string name="app_version">Version 1.0.0 . Frontend Demo</string>
+
+    <!-- Content descriptions (accessibility) -->
+    <string name="cd_app_logo">H2S Dosimeter application logo</string>
+    <string name="cd_profile_icon">Worker profile</string>
+    <string name="cd_notification_icon">Notifications</string>
+    <string name="cd_exposure_gauge">Exposure level gauge</string>
+    <string name="cd_sensor_strip">H2S sensor strip visual</string>
+
+</resources>

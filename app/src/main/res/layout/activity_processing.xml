@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_processing.xml - Colorimetric analysis in progress screen.
+    Shows animated progress steps while the mock pipeline executes.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/colorPrimary"
+    tools:context=".ui.scan.ProcessingActivity">
+
+    <!-- Animated logo / spinner area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/spacing_40">
+
+        <!-- Sensor strip icon (pulsing) -->
+        <ImageView
+            android:id="@+id/ivProcessingIcon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_sensor_strip"
+            android:tint="@color/colorAccent"
+            android:contentDescription="@string/cd_sensor_strip"
+            android:layout_marginBottom="@dimen/spacing_24" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Analysing Badge"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_headline"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_8" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Colorimetric Analysis in Progress"
+            android:textColor="#99FFFFFF"
+            android:textSize="@dimen/text_body"
+            android:layout_marginBottom="@dimen/spacing_24" />
+
+        <!-- Linear progress bar -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorColor="@color/colorAccent"
+            app:trackColor="#33FFFFFF"
+            app:trackCornerRadius="4dp" />
+    </LinearLayout>
+
+    <!-- DEMO badge -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_demo"
+        style="@style/H2SDemoBadge"
+        android:layout_marginBottom="@dimen/spacing_32" />
+
+    <!-- Processing steps card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#1AFFFFFF"
+        app:strokeColor="#33FFFFFF"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/card_padding">
+
+            <!-- Step 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/spacing_12">
+
+                <ImageView
+                    android:id="@+id/ivStep1"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_verified"
+                    android:tint="@color/colorAccent"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/tvStep1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_12"
+                    android:text="Image Quality Check"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_body" />
+            </LinearLayout>
+
+            <!-- Step 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/spacing_12">
+
+                <ImageView
+                    android:id="@+id/ivStep2"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_verified"
+                    android:tint="#33FFFFFF"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/tvStep2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_12"
+                    android:text="Reference Colour Correction"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="@dimen/text_body" />
+            </LinearLayout>
+
+            <!-- Step 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/spacing_12">
+
+                <ImageView
+                    android:id="@+id/ivStep3"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_verified"
+                    android:tint="#33FFFFFF"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/tvStep3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_12"
+                    android:text="Calibration Lookup"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="@dimen/text_body" />
+            </LinearLayout>
+
+            <!-- Step 4 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivStep4"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:src="@drawable/ic_verified"
+                    android:tint="#33FFFFFF"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:id="@+id/tvStep4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_12"
+                    android:text="Exposure Estimation"
+                    android:textColor="#99FFFFFF"
+                    android:textSize="@dimen/text_body" />
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Bottom note -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_32"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:text="All values are DEMO estimates.\nNot validated H2S measurements."
+        android:textColor="#66FFFFFF"
+        android:textSize="@dimen/text_caption"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.4" />
+
+</LinearLayout>
