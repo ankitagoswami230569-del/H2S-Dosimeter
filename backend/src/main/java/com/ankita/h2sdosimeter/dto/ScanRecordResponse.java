@@ -36,6 +36,15 @@ public class ScanRecordResponse {
     private Double  sharpness;
     private String  imageQualityLabel;
 
+    // ArUco reference-card detection + reference-scale reading
+    private Boolean cardDetected;
+    private Double  detectionConfidence;
+    private Double  scalePosition;
+    private Double  nearestSwatchDeltaE;
+    private Integer expiryR;
+    private Integer expiryG;
+    private Integer expiryB;
+
     // Calibration
     private String  calibrationStatus;
     private Double  estimatedPpmHr;        // null when UNCALIBRATED
@@ -69,6 +78,13 @@ public class ScanRecordResponse {
         r.brightness           = s.getBrightness();
         r.sharpness            = s.getSharpness();
         r.imageQualityLabel    = s.getImageQualityLabel();
+        r.cardDetected         = s.getCardDetected();
+        r.detectionConfidence  = s.getDetectionConfidence();
+        r.scalePosition        = s.getScalePosition();
+        r.nearestSwatchDeltaE  = s.getNearestSwatchDeltaE();
+        r.expiryR              = s.getExpiryR();
+        r.expiryG              = s.getExpiryG();
+        r.expiryB              = s.getExpiryB();
         r.calibrationStatus    = s.getCalibrationStatus() != null
                 ? s.getCalibrationStatus().name() : null;
         r.estimatedPpmHr       = s.getEstimatedPpmHr();
@@ -118,6 +134,13 @@ public class ScanRecordResponse {
     public Double        getBrightness()           { return brightness; }
     public Double        getSharpness()            { return sharpness; }
     public String        getImageQualityLabel()    { return imageQualityLabel; }
+    public Boolean       getCardDetected()         { return cardDetected; }
+    public Double        getDetectionConfidence()  { return detectionConfidence; }
+    public Double        getScalePosition()        { return scalePosition; }
+    public Double        getNearestSwatchDeltaE()  { return nearestSwatchDeltaE; }
+    public Integer       getExpiryR()              { return expiryR; }
+    public Integer       getExpiryG()              { return expiryG; }
+    public Integer       getExpiryB()              { return expiryB; }
     public String        getCalibrationStatus()    { return calibrationStatus; }
     public Double        getEstimatedPpmHr()       { return estimatedPpmHr; }
     public String        getCalibrationVersion()   { return calibrationVersion; }

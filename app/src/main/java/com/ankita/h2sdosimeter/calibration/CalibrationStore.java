@@ -32,10 +32,11 @@ public class CalibrationStore {
     public static final int MIN_POINTS_FOR_CONVERSION = 2;
 
     // JSON field names
-    private static final String F_DIFF      = "diff";
-    private static final String F_PPM       = "ppm";
-    private static final String F_LABEL     = "label";
-    private static final String F_TIMESTAMP = "ts";
+    private static final String F_DIFF       = "diff";
+    private static final String F_SCALE_POS  = "scalePos";
+    private static final String F_PPM        = "ppm";
+    private static final String F_LABEL      = "label";
+    private static final String F_TIMESTAMP  = "ts";
 
     // -----------------------------------------------------------------------
     // Read
@@ -55,8 +56,15 @@ public class CalibrationStore {
             JSONArray arr = new JSONArray(json);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
+                // isNull() is true both when the key is absent (points saved
+                // before scale-position existed) and when it was explicitly
+                // stored as JSONObject.NULL (no scale position for this scan).
+                double scalePos = obj.isNull(F_SCALE_POS)
+                        ? CalibrationPoint.NO_SCALE_POSITION
+                        : obj.optDouble(F_SCALE_POS, CalibrationPoint.NO_SCALE_POSITION);
                 points.add(new CalibrationPoint(
                         obj.getDouble(F_DIFF),
+                        scalePos,
                         obj.getDouble(F_PPM),
                         obj.optString(F_LABEL, ""),
                         obj.optLong(F_TIMESTAMP, 0L)
@@ -78,6 +86,24 @@ public class CalibrationStore {
      */
     public static boolean isCalibrated(Context context) {
         return loadPoints(context).size() >= MIN_POINTS_FOR_CONVERSION;
+    }
+
+    /**
+     * Returns only the calibration points that carry a recorded scale
+     * position, sorted by scalePosition ascending. Used by the preferred,
+     * lighting-independent scale-position calibration path
+     * (CalibrationCurve.convertByScalePosition) - points recorded via the
+     * legacy colour-difference-only workflow are excluded since they have
+     * no scale position to interpolate against.
+     */
+    public static List<CalibrationPoint> loadPointsByScale(Context context) {
+        List<CalibrationPoint> withScale = new ArrayList<>();
+        for (CalibrationPoint p : loadPoints(context)) {
+            if (p.hasScalePosition()) withScale.add(p);
+        }
+        Collections.sort(withScale, (a, b) ->
+                Double.compare(a.getScalePosition(), b.getScalePosition()));
+        return withScale;
     }
 
     // -----------------------------------------------------------------------
@@ -133,6 +159,9 @@ public class CalibrationStore {
             for (CalibrationPoint p : points) {
                 JSONObject obj = new JSONObject();
                 obj.put(F_DIFF,      p.getColourDifference());
+                // JSON has no NaN literal, so an absent scale position is
+                // stored as JSONObject.NULL rather than Double.NaN.
+                obj.put(F_SCALE_POS, p.hasScalePosition() ? p.getScalePosition() : JSONObject.NULL);
                 obj.put(F_PPM,       p.getKnownPpmHr());
                 obj.put(F_LABEL,     p.getLabel());
                 obj.put(F_TIMESTAMP, p.getTimestampMs());

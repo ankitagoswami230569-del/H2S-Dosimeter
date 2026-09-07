@@ -72,6 +72,15 @@ public class ScanService {
         scan.setSharpness(req.getSharpness());
         scan.setImageQualityLabel(req.getImageQualityLabel());
 
+        // ArUco reference-card detection + reference-scale reading
+        scan.setCardDetected(req.getCardDetected());
+        scan.setDetectionConfidence(req.getDetectionConfidence());
+        scan.setScalePosition(req.getScalePosition());
+        scan.setNearestSwatchDeltaE(req.getNearestSwatchDeltaE());
+        scan.setExpiryR(req.getExpiryR());
+        scan.setExpiryG(req.getExpiryG());
+        scan.setExpiryB(req.getExpiryB());
+
         // --- Calibration / ppm.hr ---
         // The Android app may send a pre-computed estimate from its local
         // calibration. We also run the server-side calibration and prefer

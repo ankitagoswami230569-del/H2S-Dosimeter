@@ -1,15 +1,17 @@
 plugins {
-    id 'com.android.application' version '9.3.2' apply true
+    // Version is declared once, in the root build.gradle, to avoid a
+    // plugin-version conflict between the root and app modules.
+    id 'com.android.application'
 }
 
 android {
     namespace 'com.ankita.h2sdosimeter'
-    compileSdk 37
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.ankita.h2sdosimeter"
         minSdk 24
-        targetSdk 37
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
     }
@@ -59,4 +61,8 @@ dependencies {
 
     // MPAndroidChart for exposure trend chart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // OpenCV (objdetect/aruco + calib3d) - reference-card ArUco marker
+    // detection and perspective rectification. See analysis/CardDetector.
+    implementation 'org.opencv:opencv:4.9.0'
 }

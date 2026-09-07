@@ -1,5 +1,6 @@
 package com.ankita.h2sdosimeter.ui.scan;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.ankita.h2sdosimeter.api.BackendSyncService;
 import com.ankita.h2sdosimeter.calibration.CalibrationCurve;
 import com.ankita.h2sdosimeter.calibration.CalibrationPoint;
 import com.ankita.h2sdosimeter.calibration.CalibrationStore;
+import com.ankita.h2sdosimeter.calibration.EnvCompensation;
 import com.ankita.h2sdosimeter.model.ColourAnalysisResult;
 import com.ankita.h2sdosimeter.util.MockDataHelper;
 
@@ -137,12 +139,35 @@ public class ProcessingActivity extends AppCompatActivity {
             Log.d(TAG, "Analysis complete: status=" + result.getStatus()
                     + " diff=" + String.format("%.1f", result.getColourDifference()));
 
-            // Run local calibration conversion
+            // Run local calibration conversion.
+            //
+            // DUAL-PATH STRATEGY:
+            //   1. PREFERRED: scale-position (lighting-independent - only
+            //      available when the ArUco reference card was detected).
+            //   2. FALLBACK: legacy colour-difference method, used when the
+            //      scale-position path is unavailable or under-calibrated.
+            //
+            // Both raw values are passed through EnvCompensation first so a
+            // scan taken far from the printed scale's reference temperature/
+            // humidity doesn't read artificially high or low. With no real
+            // environmental sensor wired up yet, this call uses the
+            // reference condition and is a safe no-op (factor == 1).
             CalibrationCurve.ConversionResult conversion = null;
             if (result.getStatus() == ColourAnalysisResult.Status.SUCCESS) {
-                List<CalibrationPoint> pts =
-                        CalibrationStore.loadPoints(getApplicationContext());
-                conversion = CalibrationCurve.convert(result.getColourDifference(), pts);
+                Context appCtx = getApplicationContext();
+
+                if (result.isCardDetected()) {
+                    List<CalibrationPoint> scalePts = CalibrationStore.loadPointsByScale(appCtx);
+                    double normalisedScalePos = EnvCompensation.normalise(result.getScalePosition());
+                    conversion = CalibrationCurve.convertByScalePosition(normalisedScalePos, scalePts);
+                }
+
+                if (conversion == null || !conversion.success) {
+                    List<CalibrationPoint> diffPts = CalibrationStore.loadPoints(appCtx);
+                    double normalisedDiff = EnvCompensation.normalise(result.getColourDifference());
+                    conversion = CalibrationCurve.convert(normalisedDiff, diffPts);
+                }
+
                 if (conversion.success) {
                     Log.d(TAG, "Local calib: "
                             + String.format("%.3f", conversion.estimatedPpmHr)

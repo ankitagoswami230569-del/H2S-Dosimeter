@@ -339,26 +339,28 @@ public class CalibrationActivity extends AppCompatActivity {
         View dialogView = LayoutInflater.from(this)
                 .inflate(R.layout.dialog_add_calibration_point, null);
 
-        EditText etColourDiff = dialogView.findViewById(R.id.etColourDiff);
-        EditText etPpmHr      = dialogView.findViewById(R.id.etPpmHr);
-        EditText etLabel      = dialogView.findViewById(R.id.etLabel);
+        EditText etColourDiff    = dialogView.findViewById(R.id.etColourDiff);
+        EditText etScalePosition = dialogView.findViewById(R.id.etScalePosition);
+        EditText etPpmHr         = dialogView.findViewById(R.id.etPpmHr);
+        EditText etLabel         = dialogView.findViewById(R.id.etLabel);
 
         new AlertDialog.Builder(this)
                 .setTitle("Add Calibration Point")
                 .setMessage("Enter values from a badge scanned under KNOWN exposure conditions. "
-                        + "The colour difference must come from a real scan of that badge.")
+                        + "The colour difference / scale position must come from a real scan of that badge.")
                 .setView(dialogView)
                 .setPositiveButton("Save", (dialog, which) -> {
-                    String diffStr = etColourDiff.getText().toString().trim();
-                    String ppmStr  = etPpmHr.getText().toString().trim();
-                    String label   = etLabel.getText().toString().trim();
-                    saveNewPoint(diffStr, ppmStr, label);
+                    String diffStr     = etColourDiff.getText().toString().trim();
+                    String scalePosStr = etScalePosition.getText().toString().trim();
+                    String ppmStr      = etPpmHr.getText().toString().trim();
+                    String label       = etLabel.getText().toString().trim();
+                    saveNewPoint(diffStr, scalePosStr, ppmStr, label);
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    private void saveNewPoint(String diffStr, String ppmStr, String label) {
+    private void saveNewPoint(String diffStr, String scalePosStr, String ppmStr, String label) {
         if (TextUtils.isEmpty(diffStr)) {
             Toast.makeText(this, "Please enter a colour difference value", Toast.LENGTH_SHORT).show();
             return;
@@ -369,9 +371,13 @@ public class CalibrationActivity extends AppCompatActivity {
         }
 
         double diff, ppm;
+        double scalePos = CalibrationPoint.NO_SCALE_POSITION;
         try {
             diff = Double.parseDouble(diffStr);
             ppm  = Double.parseDouble(ppmStr);
+            if (!TextUtils.isEmpty(scalePosStr)) {
+                scalePos = Double.parseDouble(scalePosStr);
+            }
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid number format", Toast.LENGTH_SHORT).show();
             return;
@@ -385,13 +391,17 @@ public class CalibrationActivity extends AppCompatActivity {
             Toast.makeText(this, "ppm.hr cannot be negative", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!Double.isNaN(scalePos) && scalePos < 0) {
+            Toast.makeText(this, "Scale position cannot be negative", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String autoLabel = TextUtils.isEmpty(label)
                 ? "Added " + new SimpleDateFormat("dd-MMM HH:mm", Locale.US)
                         .format(new Date())
                 : label;
 
-        CalibrationPoint point = new CalibrationPoint(diff, ppm, autoLabel,
+        CalibrationPoint point = new CalibrationPoint(diff, scalePos, ppm, autoLabel,
                 System.currentTimeMillis());
         boolean saved = CalibrationStore.addPoint(this, point);
 
@@ -468,7 +478,11 @@ public class CalibrationActivity extends AppCompatActivity {
             Context ctx = h.itemView.getContext();
 
             h.tvIndex.setText(String.valueOf(position + 1));
-            h.tvDiff.setText("Colour diff: " + String.format("%.2f", p.getColourDifference()));
+            String diffText = "Colour diff: " + String.format("%.2f", p.getColourDifference());
+            if (p.hasScalePosition()) {
+                diffText += "  |  Scale pos: " + String.format("%.2f", p.getScalePosition());
+            }
+            h.tvDiff.setText(diffText);
             h.tvPpm.setText(String.format("%.3f ppm.hr", p.getKnownPpmHr()));
             h.tvLabel.setText(p.getLabel());
             h.tvLabel.setVisibility(p.getLabel().isEmpty() ? View.GONE : View.VISIBLE);

@@ -76,6 +76,27 @@ public class ScanSubmitRequest {
     private String imageQualityLabel;
 
     // ---------------------------------------------------------------
+    // ArUco reference-card detection + reference-scale reading
+    // ---------------------------------------------------------------
+
+    /** True when the Android app's CardDetector located all reference-card markers. */
+    private Boolean cardDetected;
+
+    /** Card detection confidence, 0.0-1.0, as reported by the Android app. */
+    private Double detectionConfidence;
+
+    /** Scale-position value (dose-index units) from the Android app's ScaleReader. */
+    private Double scalePosition;
+
+    /** CIE76 delta-E from the corrected strip colour to the nearest swatch. */
+    private Double nearestSwatchDeltaE;
+
+    // Expiry indicator patch colour (after per-photo colour correction)
+    private Integer expiryR;
+    private Integer expiryG;
+    private Integer expiryB;
+
+    // ---------------------------------------------------------------
     // Calibration / ppm.hr
     // ---------------------------------------------------------------
 
@@ -145,6 +166,20 @@ public class ScanSubmitRequest {
     public void setSharpness(Double v)       { this.sharpness = v; }
     public String getImageQualityLabel()     { return imageQualityLabel; }
     public void setImageQualityLabel(String v){ this.imageQualityLabel = v; }
+    public Boolean getCardDetected()         { return cardDetected; }
+    public void setCardDetected(Boolean v)   { this.cardDetected = v; }
+    public Double getDetectionConfidence()   { return detectionConfidence; }
+    public void setDetectionConfidence(Double v){ this.detectionConfidence = v; }
+    public Double getScalePosition()         { return scalePosition; }
+    public void setScalePosition(Double v)   { this.scalePosition = v; }
+    public Double getNearestSwatchDeltaE()   { return nearestSwatchDeltaE; }
+    public void setNearestSwatchDeltaE(Double v){ this.nearestSwatchDeltaE = v; }
+    public Integer getExpiryR()              { return expiryR; }
+    public void setExpiryR(Integer v)        { this.expiryR = v; }
+    public Integer getExpiryG()              { return expiryG; }
+    public void setExpiryG(Integer v)        { this.expiryG = v; }
+    public Integer getExpiryB()              { return expiryB; }
+    public void setExpiryB(Integer v)        { this.expiryB = v; }
     public String getCalibrationStatus()     { return calibrationStatus; }
     public void setCalibrationStatus(String v){ this.calibrationStatus = v; }
     public Double getEstimatedPpmHr()        { return estimatedPpmHr; }

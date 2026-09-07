@@ -9,9 +9,11 @@ import android.util.Log;
 import com.ankita.h2sdosimeter.model.ColourAnalysisResult;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * BadgeAnalysisPipeline - Phase 4 main on-device analysis coordinator.
+ * BadgeAnalysisPipeline - Phase 4/5 main on-device analysis coordinator.
  *
  * Runs synchronously on whatever thread it is called from.
  * Call from a background thread (ProcessingActivity uses a Handler thread).
@@ -19,16 +21,27 @@ import java.io.InputStream;
  * Pipeline steps:
  *   1. Decode the JPEG bitmap from the FileProvider URI.
  *   2. Run ImageQualityChecker - reject dark, blurry or overexposed images.
- *   3. Run ColourAnalysisService - extract sensor and reference region RGB.
- *   4. Run ReferenceCorrectionService - apply white-balance correction.
- *   5. Compute colour difference (deviation from pure white).
- *   6. Return a ColourAnalysisResult with all intermediate values.
+ *   3. Run CardDetector - locate the printed reference card's ArUco markers
+ *      and rectify the photo to a fixed-size, fronto-parallel card image.
+ *      This is the ONLY lighting-DEPENDENT-camera-angle step; if it fails,
+ *      the result status is CARD_NOT_DETECTED (no further analysis).
+ *   4. Run RegionSampler - sample the reaction strip, the reference-scale
+ *      swatches and the expiry patch from the rectified card.
+ *   5. Run ColorCalibrator - fit a per-photo affine colour correction from
+ *      the captured swatches vs. their known printed colours. This cancels
+ *      THIS photo's lighting/white-balance bias, which is what makes the
+ *      reading lighting-independent.
+ *   6. Run ScaleReader - match the corrected strip colour against the
+ *      corrected scale swatches (via CIELab / CIE76 delta-E) to get a
+ *      continuous scale position.
+ *   7. Return a ColourAnalysisResult with all intermediate values.
  *
  * SAFETY NOTE:
  * This pipeline does NOT produce a validated H2S ppm.hr concentration.
- * It produces a colour-change indicator. Conversion to exposure requires
- * a laboratory-validated calibration curve that does not exist in this
- * build. The result is clearly marked "calibration required".
+ * It produces a scale-position / colour-change indicator. Conversion to
+ * exposure requires calibration points supplied via CalibrationActivity -
+ * see CalibrationCurve. Until calibrated, results are clearly marked
+ * "calibration required".
  */
 public class BadgeAnalysisPipeline {
 
@@ -80,50 +93,94 @@ public class BadgeAnalysisPipeline {
             }
 
             // ------------------------------------------------------------------
-            // Step 3: Extract sensor and reference regions
+            // Step 3: Detect the reference card and rectify to a fixed layout
             // ------------------------------------------------------------------
-            ColourAnalysisService.RegionColours regions =
-                    ColourAnalysisService.extractRegions(bitmap);
-
-            if (regions == null) {
-                return ColourAnalysisResult.error("Colour region extraction failed");
+            CardDetector.Detection detection = CardDetector.detect(bitmap);
+            if (detection == null) {
+                return ColourAnalysisResult.cardNotDetected(
+                        "Could not detect all " + ReferenceCardSpec.MARKER_COUNT
+                                + " ArUco reference-card markers, or the perspective "
+                                + "correction was degenerate.",
+                        quality.brightness,
+                        quality.sharpness,
+                        quality.qualityLabel());
             }
 
-            // ------------------------------------------------------------------
-            // Step 4: Apply reference correction
-            // ------------------------------------------------------------------
-            int[] corrected = ReferenceCorrectionService.correct(
-                    regions.sensorR, regions.sensorG, regions.sensorB,
-                    regions.refR,    regions.refG,    regions.refB,
-                    regions.referenceDetected);
+            Bitmap rectified = detection.rectified;
+            try {
+                // --------------------------------------------------------------
+                // Step 4: Sample the reaction strip, scale swatches and expiry patch
+                // --------------------------------------------------------------
+                int[] stripRaw = RegionSampler.sampleRegion(rectified, ReferenceCardSpec.REACTION_STRIP_REGION);
+                int[] expiryRaw = RegionSampler.sampleRegion(rectified, ReferenceCardSpec.EXPIRY_PATCH_REGION);
 
-            // ------------------------------------------------------------------
-            // Step 5: Colour difference
-            // ------------------------------------------------------------------
-            double diff = ReferenceCorrectionService.colourDifference(
-                    corrected[0], corrected[1], corrected[2]);
+                List<ReferenceCardSpec.Swatch> swatchSpecs = ReferenceCardSpec.swatchList();
+                int[][] capturedSwatches  = new int[swatchSpecs.size()][];
+                int[][] referenceSwatches = new int[swatchSpecs.size()][];
+                for (int i = 0; i < swatchSpecs.size(); i++) {
+                    ReferenceCardSpec.Swatch spec = swatchSpecs.get(i);
+                    capturedSwatches[i]  = RegionSampler.sampleRegion(rectified, spec.region);
+                    referenceSwatches[i] = spec.rgb;
+                }
 
-            // ------------------------------------------------------------------
-            // Step 6: Assemble result
-            // ------------------------------------------------------------------
-            String qualityLabel = quality.qualityLabel();
+                // --------------------------------------------------------------
+                // Step 5: Fit this photo's colour correction from the swatches
+                // --------------------------------------------------------------
+                ColorCalibrator calibrator = ColorCalibrator.fit(capturedSwatches, referenceSwatches);
+                if (calibrator == null) {
+                    return ColourAnalysisResult.error(
+                            "Colour calibration fit failed - need at least "
+                                    + ColorCalibrator.MIN_SWATCHES + " valid reference swatches");
+                }
 
-            String statusMsg = regions.referenceDetected
-                    ? "Analysis complete. Reference patch detected."
-                    : "Analysis complete. Reference patch NOT detected - correction not applied.";
+                int[] correctedStrip  = calibrator.apply(stripRaw[0], stripRaw[1], stripRaw[2]);
+                int[] correctedExpiry = calibrator.apply(expiryRaw[0], expiryRaw[1], expiryRaw[2]);
 
-            return new ColourAnalysisResult.Builder()
-                    .status(ColourAnalysisResult.Status.SUCCESS)
-                    .statusMessage(statusMsg)
-                    .isRealCapture(true)
-                    .rawSensor(regions.sensorR, regions.sensorG, regions.sensorB)
-                    .reference(regions.refR,    regions.refG,    regions.refB)
-                    .corrected(corrected[0],     corrected[1],    corrected[2])
-                    .colourDifference(diff)
-                    .brightness(quality.brightness)
-                    .sharpness(quality.sharpness)
-                    .imageQualityLabel(qualityLabel)
-                    .build();
+                List<ScaleReader.SwatchSample> correctedSwatches = new ArrayList<>();
+                for (int i = 0; i < swatchSpecs.size(); i++) {
+                    int[] correctedSwatch = calibrator.apply(
+                            capturedSwatches[i][0], capturedSwatches[i][1], capturedSwatches[i][2]);
+                    correctedSwatches.add(new ScaleReader.SwatchSample(
+                            swatchSpecs.get(i).doseIndex, correctedSwatch));
+                }
+
+                // --------------------------------------------------------------
+                // Step 6: Match the corrected strip colour against the scale
+                // --------------------------------------------------------------
+                ScaleReader.Reading reading = ScaleReader.read(correctedStrip, correctedSwatches);
+                if (reading == null) {
+                    return ColourAnalysisResult.error("Scale reading failed - insufficient swatches");
+                }
+
+                // Legacy colour-difference indicator, retained for backward-compatible display.
+                double colourDiff = ReferenceCorrectionService.colourDifference(
+                        correctedStrip[0], correctedStrip[1], correctedStrip[2]);
+
+                // --------------------------------------------------------------
+                // Step 7: Assemble result
+                // --------------------------------------------------------------
+                return new ColourAnalysisResult.Builder()
+                        .status(ColourAnalysisResult.Status.SUCCESS)
+                        .statusMessage("Analysis complete. Reference card detected and rectified.")
+                        .isRealCapture(true)
+                        .cardDetected(true)
+                        .detectionConfidence(detection.confidence)
+                        .rawSensor(stripRaw[0], stripRaw[1], stripRaw[2])
+                        .reference(referenceSwatches[0][0], referenceSwatches[0][1], referenceSwatches[0][2])
+                        .corrected(correctedStrip[0], correctedStrip[1], correctedStrip[2])
+                        .correctedStrip(correctedStrip[0], correctedStrip[1], correctedStrip[2])
+                        .colourDifference(colourDiff)
+                        .scalePosition(reading.scalePosition)
+                        .nearestSwatchDeltaE(reading.nearestDeltaE)
+                        .expiryRgb(correctedExpiry[0], correctedExpiry[1], correctedExpiry[2])
+                        .brightness(quality.brightness)
+                        .sharpness(quality.sharpness)
+                        .imageQualityLabel(quality.qualityLabel())
+                        .build();
+
+            } finally {
+                rectified.recycle();
+            }
 
         } finally {
             bitmap.recycle();

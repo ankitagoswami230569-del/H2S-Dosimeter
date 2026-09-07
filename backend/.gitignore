@@ -1,6 +1,7 @@
 # Build outputs
 build/
 .gradle/
+target/
 
 # Local dev credentials — never commit
 src/main/resources/application-local.properties
