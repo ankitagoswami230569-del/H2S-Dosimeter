@@ -131,6 +131,77 @@ public class CalibrationCurve {
     }
 
     /**
+     * Converts a scale-position value (from ScaleReader, via the ArUco
+     * reference-card pipeline) to an estimated ppm.hr.
+     *
+     * This is the PREFERRED conversion path: scale position is derived by
+     * comparing the reaction strip to printed reference swatches after
+     * per-photo colour correction, so - unlike colourDifference - it does
+     * not depend on the reference-white-patch heuristic and is
+     * lighting-independent. Use {@link #convert(double, List)} as a
+     * fallback when no scale-position calibration points are available
+     * (e.g. the reference card was not detected for this scan, or the
+     * device has only legacy colour-difference calibration points).
+     *
+     * Uses the same conservative piecewise-linear interpolation /
+     * extrapolation strategy as {@link #convert(double, List)} - see that
+     * method's class-level ALGORITHM CHOICE notes.
+     *
+     * @param scalePosition Value from ScaleReader.Reading.scalePosition.
+     * @param scalePoints   Calibration points that carry a scale position
+     *                      (see CalibrationStore.loadPointsByScale), sorted
+     *                      ascending by scalePosition.
+     * @return ConversionResult with ppm.hr estimate and confidence level.
+     */
+    public static ConversionResult convertByScalePosition(double scalePosition,
+                                                           List<CalibrationPoint> scalePoints) {
+
+        if (scalePoints == null || scalePoints.size() < 2) {
+            int count = scalePoints == null ? 0 : scalePoints.size();
+            return ConversionResult.insufficient(
+                    "Need at least 2 scale-position calibration points (have " + count + ")");
+        }
+
+        int n = scalePoints.size();
+        double posMin = scalePoints.get(0).getScalePosition();
+        double posMax = scalePoints.get(n - 1).getScalePosition();
+
+        if (scalePosition <= posMin) {
+            CalibrationPoint p0 = scalePoints.get(0);
+            CalibrationPoint p1 = scalePoints.get(1);
+            double ppm = linearInterpolate(
+                    p0.getScalePosition(), p0.getKnownPpmHr(),
+                    p1.getScalePosition(), p1.getKnownPpmHr(),
+                    scalePosition);
+            return ConversionResult.extrapolated(Math.max(0.0, ppm));
+        }
+
+        if (scalePosition >= posMax) {
+            CalibrationPoint p0 = scalePoints.get(n - 2);
+            CalibrationPoint p1 = scalePoints.get(n - 1);
+            double ppm = linearInterpolate(
+                    p0.getScalePosition(), p0.getKnownPpmHr(),
+                    p1.getScalePosition(), p1.getKnownPpmHr(),
+                    scalePosition);
+            return ConversionResult.extrapolated(Math.max(0.0, ppm));
+        }
+
+        for (int i = 0; i < n - 1; i++) {
+            CalibrationPoint lo = scalePoints.get(i);
+            CalibrationPoint hi = scalePoints.get(i + 1);
+            if (scalePosition >= lo.getScalePosition() && scalePosition <= hi.getScalePosition()) {
+                double ppm = linearInterpolate(
+                        lo.getScalePosition(), lo.getKnownPpmHr(),
+                        hi.getScalePosition(), hi.getKnownPpmHr(),
+                        scalePosition);
+                return ConversionResult.interpolated(Math.max(0.0, ppm));
+            }
+        }
+
+        return ConversionResult.insufficient("Unexpected calibration state");
+    }
+
+    /**
      * Linear interpolation / extrapolation.
      *   y = y0 + (x - x0) * (y1 - y0) / (x1 - x0)
      */

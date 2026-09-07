@@ -244,6 +244,11 @@ public class BackendSyncService {
         json.put("analysisStatus",        result.getStatus().name());
         json.put("analysisStatusMessage", result.getStatusMessage());
 
+        // ArUco reference-card detection - always reported (also relevant
+        // when analysisStatus == CARD_NOT_DETECTED, where cardDetected is false).
+        json.put("cardDetected",         result.isCardDetected());
+        json.put("detectionConfidence",  result.getDetectionConfidence());
+
         if (result.getStatus() == ColourAnalysisResult.Status.SUCCESS) {
             json.put("rawSensorR",       result.getRawSensorR());
             json.put("rawSensorG",       result.getRawSensorG());
@@ -258,6 +263,13 @@ public class BackendSyncService {
             json.put("brightness",       result.getBrightness());
             json.put("sharpness",        result.getSharpness());
             json.put("imageQualityLabel",result.getImageQualityLabel());
+
+            // Scale-reading fields (lighting-independent path)
+            json.put("scalePosition",       result.getScalePosition());
+            json.put("nearestSwatchDeltaE", result.getNearestSwatchDeltaE());
+            json.put("expiryR", result.getExpiryR());
+            json.put("expiryG", result.getExpiryG());
+            json.put("expiryB", result.getExpiryB());
         }
 
         // Calibration

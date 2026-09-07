@@ -34,6 +34,38 @@
             android:imeOptions="actionNext" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Scale position input (preferred, lighting-independent path) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scale Position (optional, dose-index units)"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="From the ArUco reference-card scan (lighting-independent). Leave blank if the card was not detected."
+        android:textColor="@color/colorTextHint"
+        android:textSize="@dimen/text_caption"
+        android:layout_marginBottom="@dimen/spacing_4" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. 2.35"
+        android:layout_marginBottom="@dimen/spacing_12"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etScalePosition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal|numberSigned"
+            android:imeOptions="actionNext" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <!-- ppm.hr input -->
     <TextView
         android:layout_width="match_parent"

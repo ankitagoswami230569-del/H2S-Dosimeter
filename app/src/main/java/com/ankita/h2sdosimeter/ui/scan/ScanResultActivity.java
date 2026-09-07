@@ -13,12 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.ankita.h2sdosimeter.R;
+import com.ankita.h2sdosimeter.analysis.ReferenceCardSpec;
 import com.ankita.h2sdosimeter.api.ApiConfig;
 import com.ankita.h2sdosimeter.api.BackendSyncService;
 import com.ankita.h2sdosimeter.calibration.CalibrationActivity;
 import com.ankita.h2sdosimeter.calibration.CalibrationCurve;
 import com.ankita.h2sdosimeter.calibration.CalibrationPoint;
 import com.ankita.h2sdosimeter.calibration.CalibrationStore;
+import com.ankita.h2sdosimeter.calibration.EnvCompensation;
 import com.ankita.h2sdosimeter.model.ColourAnalysisResult;
 import com.ankita.h2sdosimeter.model.ExposureRecord;
 import com.ankita.h2sdosimeter.ui.dashboard.DashboardActivity;
@@ -48,6 +50,13 @@ public class ScanResultActivity extends AppCompatActivity {
 
     public static final String EXTRA_RECORD_ID = "extra_record_id";
     private static final String TAG = "ScanResultActivity";
+
+    /**
+     * PLACEHOLDER default shift length used to convert a cumulative dose
+     * (ppm.hr) into an average concentration (ppm) when the actual shift
+     * duration is not tracked elsewhere in this build.
+     */
+    private static final double DEFAULT_SHIFT_DURATION_HOURS = 8.0;
 
     // -- Primary result card
     private TextView tvExposureValue;
@@ -188,6 +197,28 @@ public class ScanResultActivity extends AppCompatActivity {
                 );
                 break;
 
+            case CARD_NOT_DETECTED:
+                if (calibrationSection != null) calibrationSection.setVisibility(View.GONE);
+                tvExposureValue.setText("--");
+                tvExposureValue.setTextColor(getColor(R.color.colorTextSecondary));
+                if (tvExposureUnits != null)
+                    tvExposureUnits.setText("Reference card not detected");
+                tvImageQuality.setText(result.getImageQualityLabel());
+                applyCategory(
+                        "CARD NOT DETECTED",
+                        R.color.colorTextSecondary,
+                        R.drawable.bg_status_low,
+                        R.drawable.ic_warning,
+                        R.color.colorStatusWarning,
+                        "Could not detect all " + ReferenceCardSpec.MARKER_COUNT
+                        + " reference-card markers.\n"
+                        + result.getStatusMessage()
+                        + "\nRe-align the badge so all four corner markers on the "
+                        + "printed reference card are fully visible, flat and "
+                        + "unobstructed, then rescan."
+                );
+                break;
+
             case REGION_NOT_FOUND:
                 if (calibrationSection != null) calibrationSection.setVisibility(View.GONE);
                 tvExposureValue.setText("--");
@@ -235,9 +266,7 @@ public class ScanResultActivity extends AppCompatActivity {
         tvExposureValue.setTextColor(getColor(R.color.colorAccent));
 
         // -- Try local calibration-based ppm.hr conversion first --
-        List<CalibrationPoint> calibPoints = CalibrationStore.loadPoints(this);
-        CalibrationCurve.ConversionResult localConversion =
-                CalibrationCurve.convert(result.getColourDifference(), calibPoints);
+        CalibrationCurve.ConversionResult localConversion = computeLocalConversion(result);
 
         if (localConversion.success) {
             if (tvExposureUnits != null) {
@@ -276,6 +305,51 @@ public class ScanResultActivity extends AppCompatActivity {
                     R.drawable.ic_warning, R.color.colorStatusDanger,
                     "Sensor shows significant colour change from reference.\n"
                     + "Corrected RGB: " + result.getCorrectedRgbString());
+        }
+    }
+
+    /**
+     * Two-tier local dose conversion:
+     *   1. PREFERRED - scale position (lighting-independent), only tried
+     *      when the ArUco reference card was detected for this scan.
+     *   2. FALLBACK - legacy colour-difference method, used when the
+     *      scale-position path is unavailable or under-calibrated.
+     * Both raw readings are passed through EnvCompensation first so a scan
+     * taken far from the printed scale's reference temperature/humidity
+     * doesn't read artificially high or low (a no-op when no environmental
+     * sensor data is available).
+     */
+    private CalibrationCurve.ConversionResult computeLocalConversion(ColourAnalysisResult result) {
+        CalibrationCurve.ConversionResult conversion = null;
+
+        if (result.isCardDetected()) {
+            List<CalibrationPoint> scalePoints = CalibrationStore.loadPointsByScale(this);
+            double normalisedScalePos = EnvCompensation.normalise(result.getScalePosition());
+            conversion = CalibrationCurve.convertByScalePosition(normalisedScalePos, scalePoints);
+        }
+
+        if (conversion == null || !conversion.success) {
+            List<CalibrationPoint> diffPoints = CalibrationStore.loadPoints(this);
+            double normalisedDiff = EnvCompensation.normalise(result.getColourDifference());
+            conversion = CalibrationCurve.convert(normalisedDiff, diffPoints);
+        }
+
+        return conversion;
+    }
+
+    /**
+     * Displays the cumulative dose (ppm.hr) alongside the average
+     * concentration (ppm) it implies over a DEFAULT_SHIFT_DURATION_HOURS
+     * shift. Appended to the calibration confidence line since no
+     * dedicated view exists for it in this layout.
+     */
+    private void displayCumulativeDose(double cumulativePpmHr) {
+        double avgPpm = cumulativePpmHr / DEFAULT_SHIFT_DURATION_HOURS;
+        String text = String.format(Locale.US,
+                "Cumulative: %.3f ppm.hr  |  Avg over %.0fh shift: %.3f ppm",
+                cumulativePpmHr, DEFAULT_SHIFT_DURATION_HOURS, avgPpm);
+        if (tvCalibConfidence != null) {
+            tvCalibConfidence.setText(tvCalibConfidence.getText() + "\n" + text);
         }
     }
 
@@ -362,6 +436,8 @@ public class ScanResultActivity extends AppCompatActivity {
             tvCalibConfidence.setText("Confidence: OUTSIDE calibration range — lower reliability");
             tvCalibConfidence.setTextColor(getColor(R.color.colorStatusWarning));
         }
+
+        displayCumulativeDose(conversion.estimatedPpmHr);
 
         if (btnOpenCalibration != null) {
             btnOpenCalibration.setOnClickListener(v -> openCalibration());

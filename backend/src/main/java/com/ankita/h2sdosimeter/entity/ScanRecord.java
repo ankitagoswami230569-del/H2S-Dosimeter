@@ -34,7 +34,7 @@ public class ScanRecord {
     // ------------------------------------------------------------------
 
     public enum AnalysisStatus {
-        SUCCESS, QUALITY_REJECTED, REGION_NOT_FOUND, DEMO, ERROR
+        SUCCESS, QUALITY_REJECTED, REGION_NOT_FOUND, CARD_NOT_DETECTED, DEMO, ERROR
     }
 
     public enum CalibrationStatus {
@@ -124,6 +124,36 @@ public class ScanRecord {
 
     @Column(name = "image_quality_label", length = 30)
     private String imageQualityLabel;
+
+    // ------------------------------------------------------------------
+    // ArUco reference-card detection + reference-scale reading
+    // ------------------------------------------------------------------
+
+    /** True when CardDetector located all reference-card markers on-device. */
+    @Column(name = "card_detected")
+    private Boolean cardDetected;
+
+    /** Card detection confidence, 0.0-1.0, as reported by the Android app. */
+    @Column(name = "detection_confidence", columnDefinition = "DOUBLE")
+    private Double detectionConfidence;
+
+    /**
+     * Interpolated position along the printed dose scale (dose-index
+     * units), from the Android app's ScaleReader. Scale POSITION, NOT a
+     * ppm.hr value - see CalibrationService / CalibrationCurve on the
+     * Android side for the conversion.
+     */
+    @Column(name = "scale_position", columnDefinition = "DOUBLE")
+    private Double scalePosition;
+
+    /** CIE76 delta-E from the corrected strip colour to the nearest swatch. */
+    @Column(name = "nearest_swatch_delta_e", columnDefinition = "DOUBLE")
+    private Double nearestSwatchDeltaE;
+
+    // Expiry indicator patch colour (after per-photo colour correction)
+    @Column(name = "expiry_r") private Integer expiryR;
+    @Column(name = "expiry_g") private Integer expiryG;
+    @Column(name = "expiry_b") private Integer expiryB;
 
     // ------------------------------------------------------------------
     // Calibration / ppm.hr estimate
@@ -219,6 +249,20 @@ public class ScanRecord {
     public void setSharpness(Double v)               { this.sharpness = v; }
     public String getImageQualityLabel()             { return imageQualityLabel; }
     public void setImageQualityLabel(String v)       { this.imageQualityLabel = v; }
+    public Boolean getCardDetected()                 { return cardDetected; }
+    public void setCardDetected(Boolean v)           { this.cardDetected = v; }
+    public Double getDetectionConfidence()           { return detectionConfidence; }
+    public void setDetectionConfidence(Double v)     { this.detectionConfidence = v; }
+    public Double getScalePosition()                 { return scalePosition; }
+    public void setScalePosition(Double v)           { this.scalePosition = v; }
+    public Double getNearestSwatchDeltaE()            { return nearestSwatchDeltaE; }
+    public void setNearestSwatchDeltaE(Double v)     { this.nearestSwatchDeltaE = v; }
+    public Integer getExpiryR()                       { return expiryR; }
+    public void setExpiryR(Integer v)                { this.expiryR = v; }
+    public Integer getExpiryG()                       { return expiryG; }
+    public void setExpiryG(Integer v)                { this.expiryG = v; }
+    public Integer getExpiryB()                       { return expiryB; }
+    public void setExpiryB(Integer v)                { this.expiryB = v; }
     public CalibrationStatus getCalibrationStatus()  { return calibrationStatus; }
     public void setCalibrationStatus(CalibrationStatus v){ this.calibrationStatus = v; }
     public Double getEstimatedPpmHr()                { return estimatedPpmHr; }
