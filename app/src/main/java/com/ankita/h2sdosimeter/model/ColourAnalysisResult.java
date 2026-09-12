@@ -4,138 +4,119 @@ import java.io.Serializable;
 
 /**
  * ColourAnalysisResult - carries every output produced by the local
- * on-device colorimetric image analysis pipeline (Phase 4).
- *
- * SAFETY NOTICE:
- * This result is produced by image-processing heuristics running on a
- * consumer smartphone camera. It is NOT a validated occupational-health
- * measurement. The exposure conversion is marked "calibration required"
- * because no laboratory-validated calibration curve exists in this build.
- * Do not use any value in this class for safety-critical decisions.
+ * on-device colorimetric image analysis pipeline.
  */
 public class ColourAnalysisResult implements Serializable {
 
-    // ------------------------------------------------------------------
-    // Analysis status
-    // ------------------------------------------------------------------
-
     public enum Status {
-        /** Full pipeline completed - RGB values are from the real image. */
         SUCCESS,
-        /** Image quality too low to analyse (too dark, blurry, etc.). */
         QUALITY_REJECTED,
-        /** Sensor or reference region could not be located in the image. */
         REGION_NOT_FOUND,
-        /** Demo flow - no real image analysed. */
         DEMO,
-        /** Unexpected error during processing. */
         ERROR
     }
 
-    // ------------------------------------------------------------------
-    // Fields
-    // ------------------------------------------------------------------
-
     private final Status status;
-
-    /** Human-readable reason for the status (especially on failure). */
     private final String statusMessage;
-
-    /** True when this result came from a real camera capture. */
     private final boolean isRealCapture;
 
-    // Raw pixel values from the sensor region (centre crop of the image)
     private final int rawSensorR;
     private final int rawSensorG;
     private final int rawSensorB;
 
-    // Pixel values from the reference white/neutral region (top-right corner)
     private final int referenceR;
     private final int referenceG;
     private final int referenceB;
 
-    // Sensor values after reference correction (white-balance normalisation)
     private final int correctedSensorR;
     private final int correctedSensorG;
     private final int correctedSensorB;
 
-    /**
-     * Euclidean distance in RGB space between the corrected sensor colour
-     * and a pure white reference (255, 255, 255). A higher value means the
-     * badge has changed colour more - correlated with higher H2S exposure.
-     * Range 0-441 (sqrt(255^2 * 3)).
-     */
+    /** Legacy Euclidean RGB distance from white (0–441). */
     private final double colourDifference;
 
-    // Image quality metrics
-    private final double brightness;      // 0.0 - 255.0
-    private final double sharpness;       // Laplacian variance (higher = sharper)
-    private final String imageQualityLabel; // "Good" / "Acceptable" / "Poor"
+    /**
+     * ΔE₀₀ (CIEDE2000) between corrected sensor colour and pure white.
+     * Primary calibration input. Higher = more H2S exposure.
+     */
+    private final double deltaE;
 
-    // ------------------------------------------------------------------
-    // Constructor (use Builder)
-    // ------------------------------------------------------------------
+    /** CIE L*a*b* of corrected sensor region. */
+    private final double sensorL;
+    private final double sensorA;
+    private final double sensorBLab;
+
+    /** True when reference scale was detected and correction applied (MODE 1). */
+    private final boolean referenceScaleDetected;
+
+    private final double brightness;
+    private final double sharpness;
+    private final String imageQualityLabel;
 
     private ColourAnalysisResult(Builder b) {
-        this.status            = b.status;
-        this.statusMessage     = b.statusMessage;
-        this.isRealCapture     = b.isRealCapture;
-        this.rawSensorR        = b.rawSensorR;
-        this.rawSensorG        = b.rawSensorG;
-        this.rawSensorB        = b.rawSensorB;
-        this.referenceR        = b.referenceR;
-        this.referenceG        = b.referenceG;
-        this.referenceB        = b.referenceB;
-        this.correctedSensorR  = b.correctedSensorR;
-        this.correctedSensorG  = b.correctedSensorG;
-        this.correctedSensorB  = b.correctedSensorB;
-        this.colourDifference  = b.colourDifference;
-        this.brightness        = b.brightness;
-        this.sharpness         = b.sharpness;
-        this.imageQualityLabel = b.imageQualityLabel;
+        this.status               = b.status;
+        this.statusMessage        = b.statusMessage;
+        this.isRealCapture        = b.isRealCapture;
+        this.rawSensorR           = b.rawSensorR;
+        this.rawSensorG           = b.rawSensorG;
+        this.rawSensorB           = b.rawSensorB;
+        this.referenceR           = b.referenceR;
+        this.referenceG           = b.referenceG;
+        this.referenceB           = b.referenceB;
+        this.correctedSensorR     = b.correctedSensorR;
+        this.correctedSensorG     = b.correctedSensorG;
+        this.correctedSensorB     = b.correctedSensorB;
+        this.colourDifference     = b.colourDifference;
+        this.deltaE               = b.deltaE;
+        this.sensorL              = b.sensorL;
+        this.sensorA              = b.sensorA;
+        this.sensorBLab           = b.sensorBLab;
+        this.referenceScaleDetected = b.referenceScaleDetected;
+        this.brightness           = b.brightness;
+        this.sharpness            = b.sharpness;
+        this.imageQualityLabel    = b.imageQualityLabel;
     }
 
     // ------------------------------------------------------------------
     // Getters
     // ------------------------------------------------------------------
 
-    public Status getStatus()            { return status; }
-    public String getStatusMessage()     { return statusMessage; }
-    public boolean isRealCapture()       { return isRealCapture; }
-    public int getRawSensorR()           { return rawSensorR; }
-    public int getRawSensorG()           { return rawSensorG; }
-    public int getRawSensorB()           { return rawSensorB; }
-    public int getReferenceR()           { return referenceR; }
-    public int getReferenceG()           { return referenceG; }
-    public int getReferenceB()           { return referenceB; }
-    public int getCorrectedSensorR()     { return correctedSensorR; }
-    public int getCorrectedSensorG()     { return correctedSensorG; }
-    public int getCorrectedSensorB()     { return correctedSensorB; }
-    public double getColourDifference()  { return colourDifference; }
-    public double getBrightness()        { return brightness; }
-    public double getSharpness()         { return sharpness; }
-    public String getImageQualityLabel() { return imageQualityLabel; }
+    public Status  getStatus()             { return status; }
+    public String  getStatusMessage()      { return statusMessage; }
+    public boolean isRealCapture()         { return isRealCapture; }
+    public int     getRawSensorR()         { return rawSensorR; }
+    public int     getRawSensorG()         { return rawSensorG; }
+    public int     getRawSensorB()         { return rawSensorB; }
+    public int     getReferenceR()         { return referenceR; }
+    public int     getReferenceG()         { return referenceG; }
+    public int     getReferenceB()         { return referenceB; }
+    public int     getCorrectedSensorR()   { return correctedSensorR; }
+    public int     getCorrectedSensorG()   { return correctedSensorG; }
+    public int     getCorrectedSensorB()   { return correctedSensorB; }
+    public double  getColourDifference()   { return colourDifference; }
+    public double  getDeltaE()             { return deltaE; }
+    public double  getSensorL()            { return sensorL; }
+    public double  getSensorA()            { return sensorA; }
+    public double  getSensorBLab()         { return sensorBLab; }
+    public boolean isReferenceScaleDetected() { return referenceScaleDetected; }
+    public double  getBrightness()         { return brightness; }
+    public double  getSharpness()          { return sharpness; }
+    public String  getImageQualityLabel()  { return imageQualityLabel; }
 
-    /**
-     * Returns the corrected sensor colour as a formatted RGB string,
-     * e.g. "rgb(210, 195, 180)".
-     */
     public String getCorrectedRgbString() {
-        return "rgb(" + correctedSensorR + ", "
-                      + correctedSensorG + ", "
-                      + correctedSensorB + ")";
+        return "rgb(" + correctedSensorR + ", " + correctedSensorG + ", " + correctedSensorB + ")";
     }
 
     public String getRawRgbString() {
-        return "rgb(" + rawSensorR + ", "
-                      + rawSensorG + ", "
-                      + rawSensorB + ")";
+        return "rgb(" + rawSensorR + ", " + rawSensorG + ", " + rawSensorB + ")";
     }
 
     public String getReferenceRgbString() {
-        return "rgb(" + referenceR + ", "
-                      + referenceG + ", "
-                      + referenceB + ")";
+        return "rgb(" + referenceR + ", " + referenceG + ", " + referenceB + ")";
+    }
+
+    public String getLabString() {
+        return String.format("L*=%.1f  a*=%.1f  b*=%.1f", sensorL, sensorA, sensorBLab);
     }
 
     // ------------------------------------------------------------------
@@ -173,6 +154,15 @@ public class ColourAnalysisResult implements Serializable {
                 .build();
     }
 
+    public static ColourAnalysisResult dosimeterNotDetected(String reason) {
+        return new Builder()
+                .status(Status.REGION_NOT_FOUND)
+                .statusMessage(reason)
+                .isRealCapture(true)
+                .imageQualityLabel("Unknown")
+                .build();
+    }
+
     // ------------------------------------------------------------------
     // Builder
     // ------------------------------------------------------------------
@@ -185,20 +175,26 @@ public class ColourAnalysisResult implements Serializable {
         int referenceR = 255, referenceG = 255, referenceB = 255;
         int correctedSensorR, correctedSensorG, correctedSensorB;
         double colourDifference;
+        double deltaE;
+        double sensorL = 100.0, sensorA = 0.0, sensorBLab = 0.0;
+        boolean referenceScaleDetected = false;
         double brightness;
         double sharpness;
         String imageQualityLabel = "Unknown";
 
-        public Builder status(Status s)                { this.status = s; return this; }
-        public Builder statusMessage(String m)         { this.statusMessage = m; return this; }
-        public Builder isRealCapture(boolean r)        { this.isRealCapture = r; return this; }
-        public Builder rawSensor(int r, int g, int b)  { rawSensorR=r; rawSensorG=g; rawSensorB=b; return this; }
-        public Builder reference(int r, int g, int b)  { referenceR=r; referenceG=g; referenceB=b; return this; }
-        public Builder corrected(int r, int g, int b)  { correctedSensorR=r; correctedSensorG=g; correctedSensorB=b; return this; }
-        public Builder colourDifference(double d)      { this.colourDifference = d; return this; }
-        public Builder brightness(double v)            { this.brightness = v; return this; }
-        public Builder sharpness(double v)             { this.sharpness = v; return this; }
-        public Builder imageQualityLabel(String l)     { this.imageQualityLabel = l; return this; }
+        public Builder status(Status s)                  { this.status = s; return this; }
+        public Builder statusMessage(String m)           { this.statusMessage = m; return this; }
+        public Builder isRealCapture(boolean r)          { this.isRealCapture = r; return this; }
+        public Builder rawSensor(int r, int g, int b)    { rawSensorR=r; rawSensorG=g; rawSensorB=b; return this; }
+        public Builder reference(int r, int g, int b)    { referenceR=r; referenceG=g; referenceB=b; return this; }
+        public Builder corrected(int r, int g, int b)    { correctedSensorR=r; correctedSensorG=g; correctedSensorB=b; return this; }
+        public Builder colourDifference(double d)        { this.colourDifference = d; return this; }
+        public Builder deltaE(double de)                 { this.deltaE = de; return this; }
+        public Builder lab(double L, double a, double b) { sensorL=L; sensorA=a; sensorBLab=b; return this; }
+        public Builder referenceScaleDetected(boolean v) { this.referenceScaleDetected = v; return this; }
+        public Builder brightness(double v)              { this.brightness = v; return this; }
+        public Builder sharpness(double v)               { this.sharpness = v; return this; }
+        public Builder imageQualityLabel(String l)       { this.imageQualityLabel = l; return this; }
 
         public ColourAnalysisResult build() { return new ColourAnalysisResult(this); }
     }

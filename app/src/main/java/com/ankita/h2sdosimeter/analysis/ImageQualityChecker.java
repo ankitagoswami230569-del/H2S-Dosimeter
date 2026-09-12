@@ -25,13 +25,9 @@ public class ImageQualityChecker {
     // ------------------------------------------------------------------
 
     /** Minimum mean luminance (0-255) to accept the image. */
-    public static final double MIN_BRIGHTNESS = 40.0;
-
-    /** Maximum mean luminance (0-255) - above this is likely overexposed. */
-    public static final double MAX_BRIGHTNESS = 240.0;
-
-    /** Minimum Laplacian variance to consider the image sharp enough. */
-    public static final double MIN_SHARPNESS = 50.0;
+    public static final double MIN_BRIGHTNESS = 20.0;
+    public static final double MAX_BRIGHTNESS = 254.0;
+    public static final double MIN_SHARPNESS  = 5.0;
 
     // ------------------------------------------------------------------
     // Public result container

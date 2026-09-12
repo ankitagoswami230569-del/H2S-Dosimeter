@@ -13,6 +13,7 @@ import com.ankita.h2sdosimeter.calibration.CalibrationActivity;
 import com.ankita.h2sdosimeter.calibration.CalibrationCurve;
 import com.ankita.h2sdosimeter.calibration.CalibrationPoint;
 import com.ankita.h2sdosimeter.calibration.CalibrationStore;
+import com.ankita.h2sdosimeter.calibration.DemoCalibrationDataset;
 import com.ankita.h2sdosimeter.model.Badge;
 import com.ankita.h2sdosimeter.model.ColourAnalysisResult;
 import com.ankita.h2sdosimeter.model.ExposureRecord;
@@ -139,47 +140,69 @@ public class ExposureDetailActivity extends AppCompatActivity {
         tvDetailBadgeStatus.setBackgroundResource(R.drawable.bg_badge_valid);
 
         tvDetailImageQuality.setText(result.getImageQualityLabel());
-        tvLightingCorrection.setText(result.getStatus() == ColourAnalysisResult.Status.SUCCESS
-                ? "Applied (reference correction)" : "Not applied");
+
+        // Show lighting correction status based on actual scan mode
+        boolean refApplied = result.isReferenceScaleDetected();
+        if (result.getStatus() == ColourAnalysisResult.Status.SUCCESS) {
+            tvLightingCorrection.setText(refApplied
+                    ? "Applied (reference correction)"
+                    : "⚠ Not applied — reference scale not detected");
+            tvLightingCorrection.setTextColor(getColor(
+                    refApplied ? R.color.colorStatusSafe : R.color.colorStatusWarning));
+        } else {
+            tvLightingCorrection.setText("Not applied");
+            tvLightingCorrection.setTextColor(getColor(R.color.colorTextSecondary));
+        }
 
         if (result.getStatus() == ColourAnalysisResult.Status.SUCCESS) {
-            String diff = String.format(Locale.US, "%.1f", result.getColourDifference());
+            String deStr  = String.format(Locale.US, "%.2f", result.getDeltaE());
+            String rgbStr = String.format(Locale.US, "%.1f", result.getColourDifference());
+            // refApplied already declared above — reuse it here
 
-            // Try calibration-based conversion
+            // PRIMARY: use deltaE as the calibration input
             List<CalibrationPoint> calibPoints = CalibrationStore.loadPoints(this);
             CalibrationCurve.ConversionResult conversion =
-                    CalibrationCurve.convert(result.getColourDifference(), calibPoints);
+                    CalibrationCurve.convert(result.getDeltaE(), calibPoints);
+
+            boolean isSynthetic = DemoCalibrationDataset.isSyntheticDataActive(this);
+            String modeNote = refApplied
+                    ? "\nReference correction: Applied"
+                    : "\n⚠ Reference colour scale not detected\nResult is approximate — lighting correction not applied.";
 
             if (conversion.success) {
-                String ppmStr = String.format(Locale.US, "%.3f ppm.hr", conversion.estimatedPpmHr);
+                String ppmStr = String.format(Locale.US, "%.3f ppm·hr", conversion.estimatedPpmHr);
                 String confLabel = conversion.confidence == CalibrationCurve.Confidence.HIGH
                         ? "[ESTIMATE — interpolated]"
                         : "[ESTIMATE — extrapolated, lower confidence]";
-                tvExposureValue.setText(ppmStr + "\n" + confLabel
-                        + "\nColour diff: " + diff + "/441");
-                tvExposureValue.setTextColor(getColor(R.color.colorAccent));
+                String syntheticNote = isSynthetic ? "\n[SYNTHETIC — NOT VALIDATED]" : "";
+                tvExposureValue.setText(ppmStr + "\n" + confLabel + syntheticNote
+                        + "\nΔE₀₀=" + deStr + "  |  RGB diff=" + rgbStr + "/441"
+                        + modeNote);
+                tvExposureValue.setTextColor(getColor(
+                        (isSynthetic || !refApplied)
+                                ? R.color.colorStatusWarning : R.color.colorAccent));
             } else {
-                tvExposureValue.setText("Colour diff: " + diff + "/441\n[CALIBRATION REQUIRED]\n"
-                        + conversion.message);
+                tvExposureValue.setText("ΔE₀₀=" + deStr + "\n[CALIBRATION REQUIRED]\n"
+                        + conversion.message + modeNote);
                 tvExposureValue.setTextColor(getColor(R.color.colorStatusWarning));
             }
 
-            double d = result.getColourDifference();
-            if (d < 30) {
+            double de = result.getDeltaE();
+            if (de < 5.0) {
                 tvCategory.setText("MINIMAL CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusSafe));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_low);
-                tvCategoryDesc.setText("Sensor shows minimal colour change.");
-            } else if (d < 80) {
+                tvCategoryDesc.setText("Sensor shows minimal colour change (ΔE₀₀ < 5).");
+            } else if (de < 20.0) {
                 tvCategory.setText("MODERATE CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusWarning));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_elevated);
-                tvCategoryDesc.setText("Sensor shows moderate colour change.");
+                tvCategoryDesc.setText("Sensor shows moderate colour change (ΔE₀₀ 5–20).");
             } else {
                 tvCategory.setText("SIGNIFICANT CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusDanger));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_high);
-                tvCategoryDesc.setText("Sensor shows significant colour change.");
+                tvCategoryDesc.setText("Sensor shows significant colour change (ΔE₀₀ > 20).");
             }
         } else {
             tvExposureValue.setText("Analysis unavailable");
@@ -193,27 +216,42 @@ public class ExposureDetailActivity extends AppCompatActivity {
             tvRawRgb.setText(result.getRawRgbString());
             tvReferenceRgb.setText(result.getReferenceRgbString());
             tvCorrectedRgb.setText(result.getCorrectedRgbString());
-            tvColourDiff.setText(String.format(Locale.US, "%.2f / 441.0", result.getColourDifference()));
-            tvBrightness.setText(String.format(Locale.US, "%.1f / 255.0", result.getBrightness()));
+            // Show ΔE₀₀ as primary metric, RGB diff as secondary
+            tvColourDiff.setText(String.format(Locale.US,
+                    "ΔE₀₀=%.3f  |  RGB dist=%.2f/441", result.getDeltaE(), result.getColourDifference()));
+            // Show CIE Lab
+            tvBrightness.setText(result.getLabString()
+                    + String.format(Locale.US, "  (brightness=%.1f)", result.getBrightness()));
             tvSharpness.setText(String.format(Locale.US, "%.1f (Laplacian var.)", result.getSharpness()));
             tvAnalysisStatus.setText(result.getStatus().name() + ": " + result.getStatusMessage());
             if (tvCalibrationNote != null) {
                 List<CalibrationPoint> pts = CalibrationStore.loadPoints(this);
                 boolean cal = CalibrationStore.isCalibrated(this);
-                String noteText = cal
-                        ? "Calibration active: " + CalibrationCurve.rangeSummary(pts)
-                          + "\nEstimates depend on the quality of reference measurements used "
-                          + "for calibration. This value must not be used for safety decisions "
-                          + "without independent validation."
-                        : "CALIBRATION REQUIRED: The colour difference value cannot be "
-                          + "converted to ppm.hr until at least "
-                          + CalibrationStore.MIN_POINTS_FOR_CONVERSION
-                          + " calibration reference points have been added. "
-                          + "Open the Calibration screen to add reference points.";
-                tvCalibrationNote.setText(noteText);
-                tvCalibrationNote.setTextColor(cal
-                        ? getColor(R.color.colorStatusSafe)
-                        : getColor(R.color.colorStatusWarning));
+                boolean isSynthetic = DemoCalibrationDataset.isSyntheticDataActive(this);
+                boolean refAppliedNote = result.isReferenceScaleDetected();
+                String modeStr = refAppliedNote
+                        ? "Scan mode: MODE 1 — reference correction applied."
+                        : "Scan mode: MODE 2 — strip only. "
+                          + "Reference colour scale not detected. "
+                          + "No lighting correction was applied. "
+                          + "Result is approximate and lower confidence.";
+                String calibStr;
+                if (!cal) {
+                    calibStr = "CALIBRATION REQUIRED: ΔE₀₀ cannot be converted to ppm·hr until "
+                            + "at least " + CalibrationStore.MIN_POINTS_FOR_CONVERSION
+                            + " calibration reference points have been added.";
+                } else if (isSynthetic) {
+                    calibStr = "⚠ SYNTHETIC CALIBRATION ACTIVE — NOT LABORATORY VALIDATED\n"
+                            + CalibrationCurve.rangeSummary(pts) + "\n"
+                            + "These points were auto-seeded for software testing only.";
+                } else {
+                    calibStr = "Calibration active: " + CalibrationCurve.rangeSummary(pts)
+                            + "\nEstimates depend on the quality of reference measurements.";
+                }
+                tvCalibrationNote.setText(modeStr + "\n" + calibStr);
+                tvCalibrationNote.setTextColor((!cal || isSynthetic || !refAppliedNote)
+                        ? getColor(R.color.colorStatusWarning)
+                        : getColor(R.color.colorStatusSafe));
             }
         }
     }
