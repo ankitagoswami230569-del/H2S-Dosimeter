@@ -10,11 +10,11 @@
     android:orientation="vertical"
     android:padding="@dimen/card_padding">
 
-    <!-- Colour difference input -->
+    <!-- ΔE₀₀ input -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Colour Difference (0–441)"
+        android:text="ΔE₀₀ from the scan result (0–100)"
         android:textColor="@color/colorTextSecondary"
         android:textSize="@dimen/text_caption"
         android:layout_marginBottom="@dimen/spacing_4" />
@@ -22,7 +22,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="e.g. 42.3"
+        android:hint="e.g. 18.4"
         android:layout_marginBottom="@dimen/spacing_12"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 

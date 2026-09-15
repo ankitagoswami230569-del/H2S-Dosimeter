@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.ankita.h2sdosimeter.R;
+import com.ankita.h2sdosimeter.analysis.StripColourMeasurement;
 import com.ankita.h2sdosimeter.api.ApiConfig;
 import com.ankita.h2sdosimeter.api.BackendSyncService;
 import com.ankita.h2sdosimeter.calibration.CalibrationActivity;
@@ -190,19 +191,22 @@ public class ScanResultActivity extends AppCompatActivity {
 
             case REGION_NOT_FOUND:
                 if (calibrationSection != null) calibrationSection.setVisibility(View.GONE);
-                tvExposureValue.setText("--");
-                if (tvExposureUnits != null)
-                    tvExposureUnits.setText("Sensor region not detected");
+                if (tvResultCardTitle != null) tvResultCardTitle.setText("SENSOR STRIP NOT DETECTED");
+                tvExposureValue.setText("N/A");
+                tvExposureValue.setTextColor(getColor(R.color.colorStatusDanger));
+                if (tvExposureUnits != null) {
+                    tvExposureUnits.setText("Colour Diff: N/A   RGB: N/A   H2S Exposure: N/A");
+                    tvExposureUnits.setTextColor(getColor(R.color.colorStatusDanger));
+                }
                 tvImageQuality.setText(result.getImageQualityLabel());
                 applyCategory(
-                        "ANALYSIS UNAVAILABLE",
-                        R.color.colorTextSecondary,
-                        R.drawable.bg_status_low,
+                        "SENSOR STRIP NOT DETECTED",
+                        R.color.colorStatusDanger,
+                        R.drawable.bg_status_high,
                         R.drawable.ic_warning,
-                        R.color.colorStatusWarning,
-                        "Sensor region could not be located.\n"
-                        + result.getStatusMessage()
-                        + "\nEnsure the badge is centred in the frame."
+                        R.color.colorStatusDanger,
+                        result.getStatusMessage()
+                        + "\n\n[DEBUG] " + result.getDetectionDebug()
                 );
                 break;
 
@@ -229,25 +233,26 @@ public class ScanResultActivity extends AppCompatActivity {
         tvImageQuality.setText(result.getImageQualityLabel() + " [REAL]");
         tvImageQuality.setTextColor(getColor(R.color.colorAccent));
 
-        // Show colour difference score — NOT a ppm.hr value
-        String diffFormatted = String.format(Locale.US, "%.1f", result.getColourDifference());
-        tvExposureValue.setText(diffFormatted);
-        tvExposureValue.setTextColor(getColor(R.color.colorAccent));
-
-        // -- Try local calibration-based ppm.hr conversion first --
+        // ΔE₀₀: lighting-corrected colour change of the strip (calibration input)
+        double deltaE = result.getDeltaE();
         List<CalibrationPoint> calibPoints = CalibrationStore.loadPoints(this);
         CalibrationCurve.ConversionResult localConversion =
-                CalibrationCurve.convert(result.getColourDifference(), calibPoints);
+                CalibrationCurve.convert(deltaE, calibPoints);
 
         if (localConversion.success) {
+            tvExposureValue.setText(String.format(Locale.US, "%.2f", localConversion.estimatedPpmHr));
+            tvExposureValue.setTextColor(getColor(R.color.colorAccent));
             if (tvExposureUnits != null) {
-                tvExposureUnits.setText("Colour Diff (0-441) — see ppm.hr below [ESTIMATE]");
+                tvExposureUnits.setText(String.format(Locale.US,
+                        "ppm.hr [ESTIMATE]   ΔE₀₀ = %.1f", deltaE));
                 tvExposureUnits.setTextColor(getColor(R.color.colorAccent));
             }
             showCalibrationResult(result, localConversion, "device-local");
         } else {
+            tvExposureValue.setText(String.format(Locale.US, "%.1f", deltaE));
+            tvExposureValue.setTextColor(getColor(R.color.colorAccent));
             if (tvExposureUnits != null) {
-                tvExposureUnits.setText("Colour Difference (0-441) [CALIBRATION REQUIRED]");
+                tvExposureUnits.setText("ΔE₀₀ colour change [CALIBRATION REQUIRED]");
                 tvExposureUnits.setTextColor(getColor(R.color.colorStatusWarning));
             }
             showCalibrationRequired(result, localConversion.message);
@@ -259,14 +264,13 @@ public class ScanResultActivity extends AppCompatActivity {
             fetchBackendCalibration(backendScanId);
         }
 
-        // Category based on colour difference
-        double diff = result.getColourDifference();
-        if (diff < 30) {
+        // Category based on ΔE₀₀
+        if (deltaE < StripColourMeasurement.MINIMAL_CHANGE_MAX_DE) {
             applyCategory("MINIMAL CHANGE", R.color.colorStatusSafe, R.drawable.bg_status_low,
                     R.drawable.ic_verified, R.color.colorStatusSafe,
                     "Sensor shows minimal colour change from reference white.\n"
                     + "Corrected RGB: " + result.getCorrectedRgbString());
-        } else if (diff < 80) {
+        } else if (deltaE < StripColourMeasurement.MODERATE_CHANGE_MAX_DE) {
             applyCategory("MODERATE CHANGE", R.color.colorStatusWarning, R.drawable.bg_status_elevated,
                     R.drawable.ic_warning, R.color.colorStatusWarning,
                     "Sensor shows moderate colour change from reference.\n"
@@ -377,9 +381,8 @@ public class ScanResultActivity extends AppCompatActivity {
 
         tvCalibPpmValue.setText("CALIBRATION REQUIRED");
         tvCalibPpmValue.setTextColor(getColor(R.color.colorStatusWarning));
-        tvCalibStatus.setText("Colour difference: "
-                + String.format(Locale.US, "%.1f", result.getColourDifference())
-                + " / 441");
+        tvCalibStatus.setText(String.format(Locale.US,
+                "ΔE₀₀ colour change: %.1f", result.getDeltaE()));
         tvCalibStatus.setTextColor(getColor(R.color.colorTextSecondary));
         tvCalibConfidence.setText(reason + "\nTap below to add calibration points.");
         tvCalibConfidence.setTextColor(getColor(R.color.colorTextSecondary));

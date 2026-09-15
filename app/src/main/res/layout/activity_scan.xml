@@ -102,7 +102,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Place the H2S sensor wristband flat on a well-lit, neutral surface. Ensure the colour reference scale is fully visible."
+                        android:text="Place the H2S sensor wristband flat. Keep all 4 red corner marks around the strip and the white / light / dark colour card fully visible, with no glare."
                         android:textColor="@color/colorTextSecondary"
                         android:textSize="@dimen/text_body"
                         android:gravity="center"
@@ -302,7 +302,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/spacing_10"
-                            android:text="Colour reference scale is visible"
+                            android:text="4 red corner marks and colour card are visible"
                             android:textColor="@color/colorTextSecondary"
                             android:textSize="@dimen/text_body" />
                     </LinearLayout>

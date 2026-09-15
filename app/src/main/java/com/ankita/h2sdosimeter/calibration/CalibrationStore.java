@@ -25,7 +25,11 @@ import java.util.List;
 public class CalibrationStore {
 
     private static final String PREFS_NAME  = "h2s_calibration";
-    private static final String KEY_POINTS  = "calibration_points";
+    /**
+     * Versioned by colour metric: points are ΔE₀₀ values. Older RGB-distance
+     * points (key "calibration_points") are not mixed in.
+     */
+    private static final String KEY_POINTS  = "calibration_points_de00_v1";
     public  static final int    MAX_POINTS  = 20;
 
     // Minimum calibration points required to attempt ppm.hr conversion

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.ankita.h2sdosimeter.R;
+import com.ankita.h2sdosimeter.analysis.StripColourMeasurement;
 import com.ankita.h2sdosimeter.calibration.CalibrationActivity;
 import com.ankita.h2sdosimeter.calibration.CalibrationCurve;
 import com.ankita.h2sdosimeter.calibration.CalibrationPoint;
@@ -188,21 +189,26 @@ public class ExposureDetailActivity extends AppCompatActivity {
             }
 
             double de = result.getDeltaE();
-            if (de < 5.0) {
+            double minimalMax  = StripColourMeasurement.MINIMAL_CHANGE_MAX_DE;
+            double moderateMax = StripColourMeasurement.MODERATE_CHANGE_MAX_DE;
+            if (de < minimalMax) {
                 tvCategory.setText("MINIMAL CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusSafe));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_low);
-                tvCategoryDesc.setText("Sensor shows minimal colour change (ΔE₀₀ < 5).");
-            } else if (de < 20.0) {
+                tvCategoryDesc.setText(String.format(Locale.US,
+                        "Sensor shows minimal colour change (ΔE₀₀ < %.0f).", minimalMax));
+            } else if (de < moderateMax) {
                 tvCategory.setText("MODERATE CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusWarning));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_elevated);
-                tvCategoryDesc.setText("Sensor shows moderate colour change (ΔE₀₀ 5–20).");
+                tvCategoryDesc.setText(String.format(Locale.US,
+                        "Sensor shows moderate colour change (ΔE₀₀ %.0f–%.0f).", minimalMax, moderateMax));
             } else {
                 tvCategory.setText("SIGNIFICANT CHANGE");
                 tvCategory.setTextColor(getColor(R.color.colorStatusDanger));
                 tvCategory.setBackgroundResource(R.drawable.bg_status_high);
-                tvCategoryDesc.setText("Sensor shows significant colour change (ΔE₀₀ > 20).");
+                tvCategoryDesc.setText(String.format(Locale.US,
+                        "Sensor shows significant colour change (ΔE₀₀ > %.0f).", moderateMax));
             }
         } else {
             tvExposureValue.setText("Analysis unavailable");

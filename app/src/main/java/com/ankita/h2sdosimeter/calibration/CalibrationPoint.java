@@ -10,8 +10,8 @@ import java.io.Serializable;
  * concentration for a known duration under controlled conditions, then
  * scanning it in this application.
  *
- * colourDifference: the Euclidean RGB distance from white (0-441)
- *                   produced by the colour analysis pipeline for this badge.
+ * colourDifference: the lighting-corrected ΔE₀₀ (CIEDE2000 from white)
+ *                   shown on the scan result for this badge.
  * knownPpmHr:       the known H2S exposure (ppm × hours) for this badge,
  *                   verified by laboratory or certified detector measurement.
  * label:            optional user description (e.g. "1 ppm × 4 hr lab test").

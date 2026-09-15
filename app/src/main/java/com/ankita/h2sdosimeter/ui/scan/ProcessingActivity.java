@@ -135,14 +135,14 @@ public class ProcessingActivity extends AppCompatActivity {
             ColourAnalysisResult result = BadgeAnalysisPipeline.analyse(
                     getApplicationContext(), uriForPipeline);
             Log.d(TAG, "Analysis complete: status=" + result.getStatus()
-                    + " diff=" + String.format("%.1f", result.getColourDifference()));
+                    + " deltaE00=" + String.format("%.2f", result.getDeltaE()));
 
             // Run local calibration conversion
             CalibrationCurve.ConversionResult conversion = null;
             if (result.getStatus() == ColourAnalysisResult.Status.SUCCESS) {
                 List<CalibrationPoint> pts =
                         CalibrationStore.loadPoints(getApplicationContext());
-                conversion = CalibrationCurve.convert(result.getColourDifference(), pts);
+                conversion = CalibrationCurve.convert(result.getDeltaE(), pts);
                 if (conversion.success) {
                     Log.d(TAG, "Local calib: "
                             + String.format("%.3f", conversion.estimatedPpmHr)

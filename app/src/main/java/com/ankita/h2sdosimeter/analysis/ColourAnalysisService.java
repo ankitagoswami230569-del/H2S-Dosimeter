@@ -72,40 +72,79 @@ public class ColourAnalysisService {
     }
 
     // ------------------------------------------------------------------
-    // Main entry point
+    // Main entry point (legacy fixed-crop path)
     // ------------------------------------------------------------------
 
     /**
      * Extracts the average RGB from the sensor and reference regions of
-     * the provided bitmap.
-     *
-     * @param bitmap Source bitmap (not recycled by this method).
-     * @return RegionColours or null if the bitmap is invalid.
+     * the provided bitmap using fixed heuristic crops.
      */
     public static RegionColours extractRegions(Bitmap bitmap) {
         if (bitmap == null || bitmap.isRecycled()) return null;
-
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
-
         int[] sensor    = averageRegion(bitmap, w, h,
-                SENSOR_X_START, SENSOR_Y_START,
-                SENSOR_X_END,   SENSOR_Y_END);
-
+                SENSOR_X_START, SENSOR_Y_START, SENSOR_X_END, SENSOR_Y_END);
         int[] reference = averageRegion(bitmap, w, h,
-                REF_X_START, REF_Y_START,
-                REF_X_END,   REF_Y_END);
-
-        // Check reference brightness: mean > 80 means it is not fully dark
+                REF_X_START, REF_Y_START, REF_X_END, REF_Y_END);
         double refBrightness = 0.299 * reference[0]
                              + 0.587 * reference[1]
                              + 0.114 * reference[2];
         boolean refDetected = refBrightness > 80.0;
-
         return new RegionColours(
                 sensor[0], sensor[1], sensor[2],
                 reference[0], reference[1], reference[2],
                 refDetected);
+    }
+
+    /**
+     * Extracts the average RGB of the sensor strip from a DETECTED strip ROI.
+     * Samples the inner 60% × 60% of the bounding box to avoid edges/shadows.
+     *
+     * NO FALLBACK — if the ROI is null or too small, returns null.
+     * The caller (BadgeAnalysisPipeline) treats null as a hard stop.
+     *
+     * @param bitmap   Full-resolution bitmap.
+     * @param stripRoi Detected strip bounding box in original image coordinates.
+     * @return RegionColours with sensor RGB only (refR/G/B are 255 placeholders),
+     *         or null if the ROI is unusable.
+     */
+    public static RegionColours extractRegionsFromDetectedRoi(
+            Bitmap bitmap, android.graphics.Rect stripRoi) {
+        if (bitmap == null || bitmap.isRecycled() || stripRoi == null) return null;
+
+        int imgW = bitmap.getWidth();
+        int imgH = bitmap.getHeight();
+
+        // Inset 20% on each side — sample only the interior of the strip
+        int roiW   = stripRoi.width();
+        int roiH   = stripRoi.height();
+        if (roiW < 4 || roiH < 4) return null; // too small to sample
+
+        int insetX = Math.max(2, roiW / 5);
+        int insetY = Math.max(2, roiH / 5);
+        int sx0 = clamp(stripRoi.left   + insetX, 0, imgW - 1);
+        int sy0 = clamp(stripRoi.top    + insetY, 0, imgH - 1);
+        int sx1 = clamp(stripRoi.right  - insetX, sx0 + 1, imgW);
+        int sy1 = clamp(stripRoi.bottom - insetY, sy0 + 1, imgH);
+
+        long rS = 0, gS = 0, bS = 0, n = 0;
+        for (int y = sy0; y < sy1; y += 2) {
+            for (int x = sx0; x < sx1; x += 2) {
+                int pixel = bitmap.getPixel(x, y);
+                rS += android.graphics.Color.red(pixel);
+                gS += android.graphics.Color.green(pixel);
+                bS += android.graphics.Color.blue(pixel);
+                n++;
+            }
+        }
+        if (n == 0) return null;
+
+        int sR = (int)(rS / n), sG = (int)(gS / n), sB = (int)(bS / n);
+
+        // Reference RGB is provided by the detector (white patch).
+        // Set placeholders here; pipeline overwrites them with detected white patch.
+        return new RegionColours(sR, sG, sB, 255, 255, 255, true);
     }
 
     // ------------------------------------------------------------------

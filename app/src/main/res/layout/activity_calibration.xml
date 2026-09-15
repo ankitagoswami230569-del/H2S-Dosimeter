@@ -150,7 +150,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1. Expose a dosimeter badge to a known H2S concentration (e.g. 5 ppm) for a known time (e.g. 2 hr) → 10 ppm.hr.\n\n2. Scan that badge with this app and note the Colour Difference value shown on the result screen.\n\n3. Return to this screen and tap Add Calibration Point. Enter the colour difference from step 2 and the known ppm.hr from step 1.\n\n4. Repeat at a minimum with one more exposure level (ideally spanning your expected measurement range).\n\n5. Once 2+ points exist, real scans will show estimated ppm.hr."
+                        android:text="1. Expose a dosimeter badge to a known H2S concentration (e.g. 5 ppm) for a known time (e.g. 2 hr) → 10 ppm.hr.\n\n2. Scan that badge with this app and note the ΔE₀₀ value shown on the result screen.\n\n3. Return to this screen and tap Add Calibration Point. Enter the ΔE₀₀ from step 2 and the known ppm.hr from step 1.\n\n4. Repeat at a minimum with one more exposure level (ideally spanning your expected measurement range).\n\n5. Once 2+ points exist, real scans will show estimated ppm.hr."
                         android:textColor="@color/colorTextSecondary"
                         android:textSize="@dimen/text_body_small"
                         android:lineSpacingMultiplier="1.5" />

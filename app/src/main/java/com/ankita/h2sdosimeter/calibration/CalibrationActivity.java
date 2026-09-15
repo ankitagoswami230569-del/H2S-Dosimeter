@@ -346,7 +346,8 @@ public class CalibrationActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Add Calibration Point")
                 .setMessage("Enter values from a badge scanned under KNOWN exposure conditions. "
-                        + "The colour difference must come from a real scan of that badge.")
+                        + "The ΔE₀₀ value must come from a real scan of that badge "
+                        + "(shown on the scan result).")
                 .setView(dialogView)
                 .setPositiveButton("Save", (dialog, which) -> {
                     String diffStr = etColourDiff.getText().toString().trim();
@@ -360,7 +361,7 @@ public class CalibrationActivity extends AppCompatActivity {
 
     private void saveNewPoint(String diffStr, String ppmStr, String label) {
         if (TextUtils.isEmpty(diffStr)) {
-            Toast.makeText(this, "Please enter a colour difference value", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter the ΔE₀₀ value from the scan", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(ppmStr)) {
@@ -377,8 +378,8 @@ public class CalibrationActivity extends AppCompatActivity {
             return;
         }
 
-        if (diff < 0 || diff > 441) {
-            Toast.makeText(this, "Colour difference must be 0–441", Toast.LENGTH_SHORT).show();
+        if (diff < 0 || diff > 100) {
+            Toast.makeText(this, "ΔE₀₀ must be 0–100", Toast.LENGTH_SHORT).show();
             return;
         }
         if (ppm < 0) {
@@ -410,7 +411,7 @@ public class CalibrationActivity extends AppCompatActivity {
     private void onDeletePoint(CalibrationPoint point) {
         new AlertDialog.Builder(this)
                 .setTitle("Remove Calibration Point")
-                .setMessage("Remove point: diff=" + String.format("%.2f", point.getColourDifference())
+                .setMessage("Remove point: ΔE₀₀=" + String.format("%.2f", point.getColourDifference())
                         + ", " + String.format("%.3f", point.getKnownPpmHr()) + " ppm.hr?\n\n"
                         + "\"" + point.getLabel() + "\"")
                 .setPositiveButton("Remove", (d, w) -> {
@@ -468,7 +469,7 @@ public class CalibrationActivity extends AppCompatActivity {
             Context ctx = h.itemView.getContext();
 
             h.tvIndex.setText(String.valueOf(position + 1));
-            h.tvDiff.setText("Colour diff: " + String.format("%.2f", p.getColourDifference()));
+            h.tvDiff.setText("ΔE₀₀: " + String.format("%.2f", p.getColourDifference()));
             h.tvPpm.setText(String.format("%.3f ppm.hr", p.getKnownPpmHr()));
             h.tvLabel.setText(p.getLabel());
             h.tvLabel.setVisibility(p.getLabel().isEmpty() ? View.GONE : View.VISIBLE);

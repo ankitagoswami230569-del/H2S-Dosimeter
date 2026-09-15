@@ -64,7 +64,10 @@ public class ScanPayload {
             json.put("correctedSensorR", result.getCorrectedSensorR());
             json.put("correctedSensorG", result.getCorrectedSensorG());
             json.put("correctedSensorB", result.getCorrectedSensorB());
-            json.put("colourDifference", result.getColourDifference());
+            // Calibration metric: lighting-corrected ΔE₀₀ (same value as calibration points)
+            json.put("colourDifference", result.getDeltaE());
+            json.put("colourMetric",     "CIEDE2000");
+            json.put("rgbDistance",      result.getColourDifference());
             json.put("brightness",       result.getBrightness());
             json.put("sharpness",        result.getSharpness());
             json.put("imageQualityLabel", result.getImageQualityLabel());

@@ -130,7 +130,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Centre the wristband sensor strip within the frame"
+            android:text="Keep all 4 red corner marks and the colour card inside the frame. Avoid glare."
             android:textColor="#CCFFFFFF"
             android:textSize="13sp"
             android:gravity="center"

@@ -16,29 +16,23 @@ public class DemoCalibrationDataset {
     private static final String TAG = "DemoCalibration";
 
     private static final String PREFS_NAME = "h2s_demo_calibration_meta";
-    private static final String KEY_SEEDED = "demo_data_seeded_v2";
+    private static final String KEY_SEEDED = "demo_data_seeded_de00_v1";
 
     public static final String SYNTHETIC_LABEL_PREFIX = "[SYNTHETIC — NOT VALIDATED] ";
 
-    // Calibration based on actual colourDifference values from 6 strip images:
-    // Strips measure 138–199 colour difference (out of 441 max).
-    // Map this range to 1–10 ppm·hr.
-    // Below 130 = near-white = 0 ppm·hr
-    // 130–160 = light exposure = 1–3 ppm·hr
-    // 161–190 = moderate = 4–7 ppm·hr
-    // 191–220 = heavy = 8–10 ppm·hr
-    // Above 220 = very dark = up to 20 ppm·hr
+    // Synthetic ΔE₀₀ → ppm·hr points for software testing only.
+    // Anchor: an unexposed strip measures ≈5.4 ΔE₀₀ on the marked badge.
+    // Replace with points from strips exposed to KNOWN doses.
 
     private static final double[][] POINTS = {
-        // { colourDifference, known_ppm_hr }
-        {   0.0,  0.0 },   // Pure white
-        { 100.0,  0.0 },   // Near-white
-        { 130.0,  1.0 },   // Light exposure starts
-        { 160.0,  3.0 },   // Light-moderate
-        { 190.0,  6.0 },   // Moderate-heavy
-        { 220.0, 10.0 },   // Heavy
-        { 350.0, 15.0 },   // Very dark
-        { 441.0, 20.0 },   // Pure black
+        // { deltaE00, known_ppm_hr }
+        {  5.5,  0.0 },   // Unexposed strip
+        {  8.0,  1.0 },
+        { 12.0,  3.0 },
+        { 20.0,  6.0 },
+        { 30.0, 10.0 },
+        { 45.0, 15.0 },
+        { 60.0, 20.0 },
     };
 
     public static boolean seedIfEmpty(Context context) {
